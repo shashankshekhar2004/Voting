@@ -1,44 +1,37 @@
-const nodemailer = require('nodemailer');
-const Otp = require('../models/otp');
-
-const sendOtp = async (req, res) => {
+const { Resend } = require('resend');
+const resend = new Resend(process.env.OTP_API);
+const otpModel=require('../models/otp')
+const sendOtpHandler = async (req, res,next) => {
   const { email } = req.body;
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-  await Otp.create({ email, otp });
+  const otp = Math.floor(1000 + Math.random() * 9000); // 4-digit OTP
 
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_PASS
+  try {
+    await resend.emails.send({
+      from: 'onboarding@resend.dev',
+      to: email,
+      subject: 'Your OTP Code',
+      text: `Your OTP is ${otp}. It will expire in 5 minutes.`,
+    });
+    console.log(`OTP for ${email}: ${otp}`);
+    // Optionally store OTP in DB or in-memory store like Redis
+    const isEmailPresent = await otpModel.findOne({ email: email });
+    if (isEmailPresent) {
+        otpModel.set('otp', otp);
     }
-  });
+    else{
+        const otpData = new otpModel({ email, otp });
+        await otpData.save();
+    }
+    console.log(`OTP for ${email}: ${otp}`);
 
-  await transporter.sendMail({
-    from: process.env.GMAIL_USER,
-    to: email,
-    subject: 'OTP Verification',
-    text: `Your OTP is ${otp}`
-  });
-
-  res.json({ message: 'OTP sent to email' });
+    res.status(200).json({status:1,success:true, message: 'OTP sent to your email' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to send OTP' });
+  }
+  next();
 };
 
+module.exports = sendOtpHandler;
 
-const verifyOtp = async (req, res) => {
-    const { email, otp } = req.body;
-  
-    const match = await Otp.findOne({ email, otp });
-    if (!match) return res.status(400).json({status:200,success:false, error: 'Invalid or expired OTP' });
-  
-    await Otp.deleteOne({ email });
-    res.json({status:200,success:true,
-         message: 'OTP verified. Proceed to register user.' });
-  };
-  
-
-  module.exports = {
-    sendOtp,
-    verifyOtp
-  };
