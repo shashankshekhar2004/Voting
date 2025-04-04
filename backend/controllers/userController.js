@@ -5,27 +5,27 @@ const register =async (req,res)=>{
     try {
         const {name, password, email, fingerprint,otp} = req.body;
         if(!name || !password || !email){
-            res.send({
+            return res.send({
                 status:400,
                 message:"Enter All Fields"
             })
         }
         const isValidEmail = await UserModel.findOne({ email });
         if(isValidEmail){
-            res.send({
+            return res.send({
                 status:401,
                 message:"Already Registered Try Logging in"
             })
         }
         const isValidOtp =await OtpModel.findOne({email});
         if(!isValidOtp){
-            res.send({
+             return res.send({
                 status:401,
                 message:"Invalid OTP"
             })
         }
         if(isValidOtp && isValidOtp.otp!=otp){
-            res.send({
+             return res.send({
                 status:401,
                 message:"Invalid OTP"
             })
@@ -40,7 +40,9 @@ const register =async (req,res)=>{
             email:email,
         })
         await user.save()
-        res.send({
+        await OtpModel.deleteOne({email});
+
+        return res.send({
             status:200,
             message:"User Registered Successfully"
         })
