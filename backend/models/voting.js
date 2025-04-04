@@ -29,7 +29,7 @@ const pollSchema = new mongoose.Schema({
     ,
     voters:[{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'user'
+        ref:'User'
     }],
     totalVotes: {
         type: Number,
