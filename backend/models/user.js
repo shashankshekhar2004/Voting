@@ -15,8 +15,7 @@ const userSchema=new mongoose.Schema({
         unique:true
     },
     fingerprint:{
-        type:String,
-        required:true
+        type:String
     }
 },{timestamps:true})
 module.exports =mongoose.model('User',userSchema);
