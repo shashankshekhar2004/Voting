@@ -25,8 +25,7 @@ const pollSchema = new mongoose.Schema({
     }],
     ImageUrl:{
         type:String,
-    }
-    ,
+    },
     voters:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User'
@@ -39,6 +38,16 @@ const pollSchema = new mongoose.Schema({
         type: Date,
         required: true
     },
+    openToAll: {
+        type: Boolean,
+        default: false
+    },
+    allowedRollRange: {
+        from: { type: String },  // e.g. 2021BCS001
+        to: { type: String }
+    }
+    
+    
 }, { timestamps: true });
 
 module.exports = mongoose.model('Poll', pollSchema);
