@@ -40,5 +40,37 @@ const createPoll = async (req, res) => {
         return res.status(500).json({ error: 'Failed to create poll' });
     }
 };
+const allPolls=async(req,res)=>{
+    try{
+        const polls = await pollModel.find();
+        return res.status(200).json({polls});
 
-module.exports = { createPoll }
+
+    }
+ catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Failed to caste vote' });
+}
+}
+
+
+
+
+
+
+
+
+// const castVote=async(req,res)=>{
+//     try{
+//         const {id}=req.params;
+//         const {pollId}=req.body;
+
+
+//     }
+//  catch (error) {
+//     console.error(error);
+//     return res.status(500).json({ error: 'Failed to caste vote' });
+// }
+// }
+
+module.exports = { createPoll ,allPolls}
