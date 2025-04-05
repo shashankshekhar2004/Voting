@@ -16,8 +16,9 @@ const sendOtpHandler = async (req, res,next) => {
     console.log(`OTP for ${email}: ${otp}`);
     // Optionally store OTP in DB or in-memory store like Redis
     const isEmailPresent = await otpModel.findOne({ email: email });
-    if (isEmailPresent) {
-        otpModel.set('otp', otp);
+      if (isEmailPresent) {
+        isEmailPresent.otp = otp;
+        await isEmailPresent.save();
     }
     else{
         const otpData = new otpModel({ email, otp });

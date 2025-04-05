@@ -4,12 +4,12 @@ require('dotenv').config();
 const connect=require('./db');
 const app = express();
 app.use(cors());
-const registerRouter=require('./routes/register.route')
+const userRouter=require('./routes/register.route')
 app.use(express.json());
 connect();
 const port = process.env.PORT ||6000;
 
-app.use('/api/v1',registerRouter)
+app.use('/api/v1',userRouter)
 
 
 
