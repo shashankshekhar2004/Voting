@@ -36,8 +36,15 @@ const pollSchema = new mongoose.Schema({
         default: "Nit Jsr Image"
     },
     voters: [{
+        voterId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        },
+        votedTo:{
+            type: String,
+            required: true
+        }
+
     }],
     totalVotes: {
         type: Number,

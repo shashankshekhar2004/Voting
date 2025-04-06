@@ -76,6 +76,19 @@ const allowedToVote = async (req, res) => {
         return res.status(403).json({ error: 'Poll has expired' });
     }
 
+
+    //  Check if user already voted
+    const hasVoted = poll.voters.find(voter => voter.voterId.toString() === id);
+    if (hasVoted) {
+        return res.status(403).json({
+            status: 200,
+            error: 'You have already voted',
+            alreadyVoted: true,
+            candidateUUID:hasVoted.votedTo
+        });
+    }
+
+
     if (poll.openToAll === true ) {
         return res.send({
             success: true,
@@ -110,5 +123,60 @@ const allowedToVote = async (req, res) => {
 };
 
 
+const castVote = async (req, res) => {
+    try {
+        const { id } = req.params; // voterId from route
+        const { pollId, candidateId } = req.body;
+        console.log(id)
+        // 1. Fetch the poll
+        const poll = await pollModel.findById(pollId);
+        if (!poll) {
+            return res.status(404).json({ error: 'Poll not found' });
+        }
 
-module.exports = { createPoll, allPolls, allowedToVote };
+        // 2. Check if this voter already voted
+        const hasVoted = poll.voters.find(voter => voter.voterId.toString() === id);
+    if (hasVoted) {
+        return res.status(403).json({
+            status: 200,
+            error: 'You have already voted',
+            alreadyVoted: true,
+            candidateUUID:hasVoted.votedTo
+        });
+    }
+
+        // 3. Find the candidate
+        const candidate = poll.candidatesArray.find(c => c.candidateId === candidateId);
+        if (!candidate) {
+            return res.status(404).json({ error: 'Candidate not found' });
+        }
+
+        // 4. Increment vote and totalVotes
+        candidate.votes += 1;
+        poll.totalVotes += 1;
+
+        // 5. Push into voters array
+        poll.voters.push({
+            voterId: id,
+            votedTo: candidateId
+        });
+
+        // 6. Save the poll
+        await poll.save();
+
+        return res.status(200).json({
+            message: `Vote casted successfully for ${candidate.candidateName}`,
+            votes: candidate.votes,
+            totalVotes: poll.totalVotes
+        });
+
+    } catch (error) {
+        console.error("Error while casting vote:", error);
+        return res.status(500).json({ error: 'Failed to cast vote' });
+    }
+};
+
+
+
+
+module.exports = { createPoll, allPolls, allowedToVote,castVote };
