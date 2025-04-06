@@ -55,7 +55,11 @@ const pollSchema = new mongoose.Schema({
     allowedRollRange: {
         from: { type: String },
         to: { type: String }
-    }
+    },
+    allowedDomains: {
+        type: String,
+        default: "*"
+    },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Poll', pollSchema);
