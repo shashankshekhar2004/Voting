@@ -16,7 +16,7 @@ const pollSchema = new mongoose.Schema({
         },
         candidateId: {
             type: String,
-            required: true
+            // required: true
         },
         description: {
             type: String,

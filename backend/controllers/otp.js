@@ -33,13 +33,17 @@ const sendOtpHandler = async (req, res, next) => {
         console.error('Error sending OTP:', error);
       } else {
         console.log('OTP sent:',otp, info.response);
-        return res.send({
+         res.send({
           status: 1,
           success: true,
           message: 'OTP sent via Gmail',
         })
       }
     });
+    const otpObject=new otpModel({email:email,otp:otp});
+    await otpObject.save();
+    return res.send({message:"otp saved"})
+    
   } catch (error) {
     console.log(error)
   }
