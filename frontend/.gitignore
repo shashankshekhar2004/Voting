@@ -11,9 +11,6 @@ node_modules
 dist
 dist-ssr
 *.local
-.env
-# E:/mern/pyq/Backend/.env
-Backend/.env 
 
 # Editor directories and files
 .vscode/*
