@@ -51,6 +51,7 @@ const register = async (req, res) => {
         await OtpModel.deleteOne({ email });
 
         return res.send({
+            success:true,
             status: 200,
             message: "User Registered Successfully",
             token: token,
@@ -110,8 +111,9 @@ const login = async (req, res) => {
         await OtpModel.deleteOne({ email });
 
         return res.send({
+            success:true,
             status: 200,
-            message: "User Registered Successfully",
+            message: "User loggedIn Successfully",
             token: token,
             id: user._id
         })
