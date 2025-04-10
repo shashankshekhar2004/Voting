@@ -40,9 +40,13 @@ const sendOtpHandler = async (req, res, next) => {
         })
       }
     });
+    const IsOtpPresent = await otpModel.findOne({ email: email });
+    if(IsOtpPresent){
+      await otpModel.deleteOne({ email: email });
+    }
     const otpObject=new otpModel({email:email,otp:otp});
     await otpObject.save();
-    return res.send({message:"otp saved"})
+    return res.send({success:true,message:"otp saved"})
     
   } catch (error) {
     console.log(error)

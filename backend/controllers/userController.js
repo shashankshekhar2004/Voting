@@ -1,44 +1,44 @@
-const UserModel =require('../models/user') 
+const UserModel = require('../models/user')
 const bcrypt = require('bcrypt')
-const OtpModel=require('../models/otp')
-const jwt= require('jsonwebtoken')
-const register =async (req,res)=>{
+const OtpModel = require('../models/otp')
+const jwt = require('jsonwebtoken')
+const register = async (req, res) => {
     try {
-        const {name, password, email, fingerprint,otp} = req.body;
-        if(!name || !password || !email){
+        const { name, password, email, fingerprint, otp } = req.body;
+        if (!name || !password || !email) {
             return res.send({
-                status:400,
-                message:"Enter All Fields"
+                status: 400,
+                message: "Enter All Fields"
             })
         }
         const isValidEmail = await UserModel.findOne({ email });
-        if(isValidEmail){
+        if (isValidEmail) {
             return res.send({
-                status:401,
-                message:"Already Registered Try Logging in"
+                status: 401,
+                message: "Already Registered Try Logging in"
             })
         }
-        const isValidOtp =await OtpModel.findOne({email});
-        if(!isValidOtp){
-             return res.send({
-                status:401,
-                message:"Invalid OTP"
+        const isValidOtp = await OtpModel.findOne({ email });
+        if (!isValidOtp) {
+            return res.send({
+                status: 401,
+                message: "Invalid OTP"
             })
         }
-        if(isValidOtp && isValidOtp.otp!=otp){
-             return res.send({
-                status:401,
-                message:"Invalid OTP"
+        if (isValidOtp && isValidOtp.otp != otp) {
+            return res.send({
+                status: 401,
+                message: "Invalid OTP"
             })
-        }      
+        }
 
-          
 
-        const hashPassword=await bcrypt.hash(password,10);
-        const user=new UserModel ({
-            name:name,
-            password:hashPassword,
-            email:email,
+
+        const hashPassword = await bcrypt.hash(password, 10);
+        const user = new UserModel({
+            name: name,
+            password: hashPassword,
+            email: email,
         })
         await user.save()
         const token = jwt.sign(
@@ -48,11 +48,11 @@ const register =async (req,res)=>{
         );
 
 
-        await OtpModel.deleteOne({email});
+        await OtpModel.deleteOne({ email });
 
         return res.send({
-            status:200,
-            message:"User Registered Successfully",
+            status: 200,
+            message: "User Registered Successfully",
             token: token,
             id: user._id
         })
@@ -61,43 +61,43 @@ const register =async (req,res)=>{
         console.log(error)
     }
 }
-const login =async (req,res)=>{
+const login = async (req, res) => {
     try {
-        const { password, email,otp} = req.body;
-        if( !password || !email|| !otp ){
+        const { password, email, otp } = req.body;
+        if (!password || !email || !otp) {
             return res.send({
-                status:400,
-                message:"Enter All Fields"
+                status: 400,
+                message: "Enter All Fields"
             })
         }
 
         const isValidEmail = await UserModel.findOne({ email });
-        if(!isValidEmail){
+        if (!isValidEmail) {
             return res.send({
-                status:401,
-                message:"User Not Found"
+                status: 401,
+                message: "User Not Found"
             })
 
         }
-        const isValidOtp =await OtpModel.findOne({email});
-        if(!isValidOtp){
-             return res.send({
-                status:401,
-                message:"Invalid OTP"
+        const isValidOtp = await OtpModel.findOne({ email });
+        if (!isValidOtp) {
+            return res.send({
+                status: 401,
+                message: "Invalid OTP"
             })
         }
-        if(isValidOtp && isValidOtp.otp!=otp){
-             return res.send({
-                status:401,
-                message:"Invalid OTP"
-            })
-        }      
-        const user=await UserModel.findOne({email});
-        const isMatch = await bcrypt.compare(password, user.password);
-        if(!isMatch){
+        if (isValidOtp && isValidOtp.otp != otp) {
             return res.send({
-                status:401,
-                message:"Invalid Password"
+                status: 401,
+                message: "Invalid OTP"
+            })
+        }
+        const user = await UserModel.findOne({ email });
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.send({
+                status: 401,
+                message: "Invalid Password"
             })
         }
         const token = jwt.sign(
@@ -107,11 +107,11 @@ const login =async (req,res)=>{
         );
 
 
-        await OtpModel.deleteOne({email});
+        await OtpModel.deleteOne({ email });
 
         return res.send({
-            status:200,
-            message:"User Registered Successfully",
+            status: 200,
+            message: "User Registered Successfully",
             token: token,
             id: user._id
         })
@@ -122,4 +122,4 @@ const login =async (req,res)=>{
     }
 }
 
-module.exports = {register,login};
+module.exports = { register, login };
