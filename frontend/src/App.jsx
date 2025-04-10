@@ -32,7 +32,10 @@ function AppContent() {
           element={isLoggedIn ? <Home /> : <Navigate to="/login" />}
         />
         <Route path="/signup" element={<SignupWithOTP />} />
-        <Route path="/login" element={<LogInWithOTP />} />
+        <Route
+          path="/login"
+          element={isLoggedIn ? <Navigate to="/" /> : <LogInWithOTP />}
+        />
       </Routes>
     </>
   );
