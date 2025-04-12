@@ -1,52 +1,69 @@
-import axios from 'axios';
-import React, { useState } from 'react';
-import toast, { Toaster } from 'react-hot-toast';
-import { Link } from 'react-router-dom'; 
+import axios from "axios";
+import React, { useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
+import { Link } from "react-router-dom";
 
 const SignupWithOTP = () => {
   const [otpSent, setOtpSent] = useState(false);
   const [form, setForm] = useState({
-    name: '',
-    email: '',
-    password: '',
-    otp: ''
+    name: "",
+    email: "",
+    password: "",
+    otp: "",
   });
 
   const handleChange = (e) => {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const validateEmail = (email) => {
     return /\S+@\S+\.\S+/.test(email);
   };
 
-
   const sendOTP = async () => {
     if (!form.email) {
-      toast.error('Please enter your email first.');
+      toast.error("Please enter your email first.");
       return;
     }
 
     if (!validateEmail(form.email)) {
-      toast.error('Please enter a valid email address.');
+      toast.error("Please enter a valid email address.");
       return;
     }
 
     try {
-      const response=await axios.post("http://localhost:8000/api/v1/sendotp",{email:form.email});
+      const response = await axios.post(
+        "http://localhost:8000/api/v1/sendotp",
+        { email: form.email }
+      );
 
-      console.log(response)
-      if(response.data.success) toast.success('Otp Sent successfully!');
-
+      console.log(response);
+      if (response.data.success) toast.success("Otp Sent successfully!");
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   };
 
-  const handleSubmit = async() => {
-    const response =await axios.post("http://localhost:8000/api/v1/register" ,{name:form.name, email:form.email, password:form.password, otp:form.otp});
-
-    console.log(response)
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/v1/register",
+        {
+          name: form.name,
+          email: form.email,
+          password: form.password,
+          otp: form.otp,
+        }
+      );
+      console.log(response);
+      if (response.data.success === true) {
+        toast.success(response.data.message);
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("id", response.data.id);
+      } else toast.error(response.data.message);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -131,16 +148,17 @@ const SignupWithOTP = () => {
           </button>
 
           <p className="text-center text-sm text-gray-700 dark:text-white mt-4">
-            Already have an account?{' '}
-            <Link to="/login" className="text-blue-600 hover:underline dark:text-blue-400">
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              className="text-blue-600 hover:underline dark:text-blue-400"
+            >
               Log in
             </Link>
           </p>
-
         </div>
       </div>
     </div>
-
   );
 };
 

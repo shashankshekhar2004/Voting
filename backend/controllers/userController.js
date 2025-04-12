@@ -7,6 +7,7 @@ const register = async (req, res) => {
         const { name, password, email, fingerprint, otp } = req.body;
         if (!name || !password || !email) {
             return res.send({
+                success:false,
                 status: 400,
                 message: "Enter All Fields"
             })
@@ -14,6 +15,7 @@ const register = async (req, res) => {
         const isValidEmail = await UserModel.findOne({ email });
         if (isValidEmail) {
             return res.send({
+                success:false,
                 status: 401,
                 message: "Already Registered Try Logging in"
             })
@@ -21,12 +23,14 @@ const register = async (req, res) => {
         const isValidOtp = await OtpModel.findOne({ email });
         if (!isValidOtp) {
             return res.send({
+                success:false,
                 status: 401,
                 message: "Invalid OTP"
             })
         }
         if (isValidOtp && isValidOtp.otp != otp) {
             return res.send({
+                success:false,
                 status: 401,
                 message: "Invalid OTP"
             })
@@ -51,6 +55,7 @@ const register = async (req, res) => {
         await OtpModel.deleteOne({ email });
 
         return res.send({
+            success:true,
             status: 200,
             message: "User Registered Successfully",
             token: token,
@@ -65,8 +70,10 @@ const login = async (req, res) => {
     try {
         const { password, email, otp } = req.body;
         if (!password || !email || !otp) {
+
             return res.send({
                 status: 400,
+                success:false,
                 message: "Enter All Fields"
             })
         }
@@ -74,6 +81,7 @@ const login = async (req, res) => {
         const isValidEmail = await UserModel.findOne({ email });
         if (!isValidEmail) {
             return res.send({
+                success:false,
                 status: 401,
                 message: "User Not Found"
             })
@@ -82,12 +90,14 @@ const login = async (req, res) => {
         const isValidOtp = await OtpModel.findOne({ email });
         if (!isValidOtp) {
             return res.send({
+                success:false,
                 status: 401,
                 message: "Invalid OTP"
             })
         }
         if (isValidOtp && isValidOtp.otp != otp) {
             return res.send({
+                success:false,
                 status: 401,
                 message: "Invalid OTP"
             })
@@ -96,8 +106,9 @@ const login = async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.send({
+                success:false,
                 status: 401,
-                message: "Invalid Password"
+                message: "Invalid credentials"
             })
         }
         const token = jwt.sign(
@@ -111,7 +122,8 @@ const login = async (req, res) => {
 
         return res.send({
             status: 200,
-            message: "User Registered Successfully",
+            success: true,
+            message: "User logged in Successfully",
             token: token,
             id: user._id
         })

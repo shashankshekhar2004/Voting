@@ -2,6 +2,7 @@ const pollModel = require('../models/voting');
 const userModel = require('../models/user');
 const { v4: uuidv4 } = require('uuid');
 const otpModel=require('../models/otp')
+
 const createPoll = async (req, res) => {
     try {
         const { createdBy } = req.params;
@@ -42,6 +43,71 @@ const createPoll = async (req, res) => {
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: 'Failed to create poll' });
+    }
+};
+
+
+const allowedToVote = async (req, res) => {
+    const { userId } = req.params;
+    const { pollId } = req.body;
+
+    const user = await userModel.findById(userId);
+    if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+    }
+
+    const poll = await pollModel.findById(pollId);
+    if (!poll) {
+        return res.status(404).json({ error: 'Poll not found' });
+    }
+
+    if (poll.expiryDate < new Date()) {
+        return res.status(403).json({ error: 'Poll has expired' });
+    }
+
+
+    //  Check if user already voted
+    const hasVoted = poll.voters.find(voter => voter.voterId.toString() === id);
+    if (hasVoted) {
+        return res.status(403).json({
+            status: 200,
+            error: 'You have already voted',
+            alreadyVoted: true,
+            candidateUUID:hasVoted.votedTo
+        });
+    }
+
+
+    if (poll.openToAll === true ) {
+        return res.send({
+            success: true,
+            status: 200,
+            message: "You are allowed to vote"
+        });
+    }
+
+    const email = user.email;
+    const rollNumber = email.split('@')[0]; // Extract roll number
+    const domain = email.split('@')[1]; // Extract domain
+
+    const allowedRangeFrom = poll.allowedRollRange.from, allowedRangeTo = poll.allowedRollRange.to;
+
+    if(allowedRangeFrom === "*" && "*" === allowedRangeTo && domain === poll.allowedDomains){
+        return res.send({
+            success: true,
+            status: 200,
+            message: "You are allowed to vote"
+        });
+    }
+    else if( rollNumber >= allowedRangeFrom && rollNumber <= allowedRangeTo && domain === poll.allowedDomains  ){
+        return res.send({
+            success: true,
+            status: 200,
+            message: "You are allowed to vote"
+        }); 
+    } 
+    else {
+        return res.status(403).json({ error: "You are not in the allowed roll number range" });
     }
 };
 
@@ -131,69 +197,6 @@ const allPolls = async (req, res) => {
 }
 
 
-const allowedToVote = async (req, res) => {
-    const { userId } = req.params;
-    const { pollId } = req.body;
-
-    const user = await userModel.findById(userId);
-    if (!user) {
-        return res.status(404).json({ error: 'User not found' });
-    }
-
-    const poll = await pollModel.findById(pollId);
-    if (!poll) {
-        return res.status(404).json({ error: 'Poll not found' });
-    }
-
-    if (poll.expiryDate < new Date()) {
-        return res.status(403).json({ error: 'Poll has expired' });
-    }
-
-
-    //  Check if user already voted
-    const hasVoted = poll.voters.find(voter => voter.voterId.toString() === id);
-    if (hasVoted) {
-        return res.status(403).json({
-            status: 200,
-            error: 'You have already voted',
-            alreadyVoted: true,
-            candidateUUID:hasVoted.votedTo
-        });
-    }
-
-
-    if (poll.openToAll === true ) {
-        return res.send({
-            success: true,
-            status: 200,
-            message: "You are allowed to vote"
-        });
-    }
-
-    const email = user.email;
-    const rollNumber = email.split('@')[0]; // Extract roll number
-    const domain = email.split('@')[1]; // Extract domain
-
-    const allowedRangeFrom = poll.allowedRollRange.from, allowedRangeTo = poll.allowedRollRange.to;
-
-    if(allowedRangeFrom === "*" && "*" === allowedRangeTo && domain === poll.allowedDomains){
-        return res.send({
-            success: true,
-            status: 200,
-            message: "You are allowed to vote"
-        });
-    }
-    else if( rollNumber >= allowedRangeFrom && rollNumber <= allowedRangeTo && domain === poll.allowedDomains  ){
-        return res.send({
-            success: true,
-            status: 200,
-            message: "You are allowed to vote"
-        }); 
-    } 
-    else {
-        return res.status(403).json({ error: "You are not in the allowed roll number range" });
-    }
-};
 
 
 

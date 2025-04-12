@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import React, { useState } from "react";
+import { Menu, X } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const SlidingNavbar = () => {
   const [open, setOpen] = useState(false);
@@ -25,23 +26,42 @@ const SlidingNavbar = () => {
       {/* Sidebar */}
       <div
         className={`fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-lg z-50 transform transition-transform duration-300 ${
-          open ? 'translate-x-0' : '-translate-x-full'
+          open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* Close Button */}
         <div className="flex justify-between items-center p-4 border-b border-gray-300 dark:border-gray-700">
-          <h2 className="text-lg font-bold text-gray-800 dark:text-white">Menu</h2>
+          <h2 className="text-lg font-bold text-gray-800 dark:text-white">
+            Menu
+          </h2>
           <button onClick={() => setOpen(false)}>
             <X className="text-gray-700 dark:text-white" />
           </button>
         </div>
 
         {/* Links */}
-        <nav className="flex flex-col p-4 space-y-3 text-gray-700 dark:text-white">
-          <a href="#" className="hover:text-blue-500">Home</a>
-          <a href="#" className="hover:text-blue-500">About</a>
-          <a href="#" className="hover:text-blue-500">Services</a>
-          <a href="#" className="hover:text-blue-500">Contact</a>
+        <nav
+          onClick={() => setOpen(false)}
+          className="flex flex-col  p-4 space-y-3 text-gray-700 dark:text-white"
+        >
+          <Link to="/" className="hover:text-blue-500">
+            All Polls
+          </Link>
+          <Link to="/livepolls" className="hover:text-blue-500">
+            Live Polls
+          </Link>
+          <Link to="/expiredpolls" className="hover:text-blue-500">
+            Expired Polls
+          </Link>
+          <Link to="/viewyourpolls" className="hover:text-blue-500">
+            View Your Polls
+          </Link>
+          <Link to="/createpoll" className="hover:text-blue-500">
+            create poll
+          </Link>
+          <Link to="#" className="hover:text-blue-500">
+            Contact
+          </Link>
         </nav>
       </div>
     </div>

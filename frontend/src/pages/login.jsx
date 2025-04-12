@@ -1,33 +1,63 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; 
-import toast, { Toaster } from 'react-hot-toast';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import toast, { Toaster } from "react-hot-toast";
+import axios from "axios";
 
 const LogInWithOTP = () => {
   const [otpSent, setOtpSent] = useState(false);
   const [form, setForm] = useState({
-    email: '',
-    password: '',
-    otp: ''
+    email: "",
+    password: "",
+    otp: "",
   });
 
   const handleChange = (e) => {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const sendOTP = () => {
-    if (form.email) {
-      setOtpSent(true);
-      toast.success('OTP sent to your email!');
-    } else {
-      toast.error('Please enter your email first.');
+  const validateEmail = (email) => {
+    return /\S+@\S+\.\S+/.test(email);
+  };
+
+  const sendOTP = async () => {
+    if (!form.email) {
+      toast.error("Please enter your email first.");
+      return;
+    }
+
+    if (!validateEmail(form.email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/v1/sendotp",
+        { email: form.email }
+      );
+
+      console.log(response);
+      if (response.data.success) toast.success("Otp Sent successfully!");
+    } catch (error) {
+      console.log(error);
     }
   };
 
-  const handleSubmit = () => {
-    if (form.otp === '123456') {
-      toast.success('Logged in successfully!');
-    } else {
-      toast.error('Invalid OTP. Try again.');
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post("http://localhost:8000/api/v1/login", {
+        email: form.email,
+        password: form.password,
+        otp: form.otp,
+      });
+      console.log(response);
+      if (response.data.success === true) {
+        toast.success(response.data.message);
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("id", response.data.id);
+      } else toast.error(response.data.message);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -42,7 +72,9 @@ const LogInWithOTP = () => {
           </h2>
 
           <div className="mb-3">
-            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Email</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+              Email
+            </label>
             <input
               type="email"
               name="email"
@@ -54,7 +86,9 @@ const LogInWithOTP = () => {
           </div>
 
           <div className="mb-3">
-            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Password</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+              Password
+            </label>
             <input
               type="password"
               name="password"
@@ -66,7 +100,9 @@ const LogInWithOTP = () => {
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">OTP</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
+              OTP
+            </label>
             <div className="flex">
               <input
                 type="text"
@@ -94,8 +130,11 @@ const LogInWithOTP = () => {
 
           {/* Link to Sign Up */}
           <p className="text-center text-sm text-gray-700 dark:text-white mt-4">
-            Don’t have an account?{' '}
-            <Link to="/signup" className="text-blue-600 hover:underline dark:text-blue-400">
+            Don’t have an account?{" "}
+            <Link
+              to="/signup"
+              className="text-blue-600 hover:underline dark:text-blue-400"
+            >
               Create one
             </Link>
           </p>
