@@ -22,7 +22,7 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="p-6 bg-zinc-700 min-h-screen grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+    <div className="p-6 bg-gradient-to-r 	from-lime-400 via-yellow-300 to-orange-400 min-h-screen grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
       {[...polls]
         .sort((a, b) => {
           const aExpired = new Date(a.expiryDate) < new Date();
