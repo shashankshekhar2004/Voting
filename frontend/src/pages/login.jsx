@@ -55,6 +55,7 @@ const LogInWithOTP = () => {
         toast.success(response.data.message);
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("id", response.data.id);
+        localStorage.setItem("email", form.email);
       } else toast.error(response.data.message);
     } catch (error) {
       console.log(error);

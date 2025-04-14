@@ -8,6 +8,8 @@ import LivePolls from "./pages/livePoll";
 import ExpirePolls from "./pages/expirePoll";
 import ViewYourPolls from "./pages/viewYourPolls";
 import CreatePoll from "./pages/createPoll";
+import CandidateCard from "./components/candidateCard";
+import CandidatePage from "./pages/pollCandidates";
 
 function AppContent() {
   const location = useLocation();
@@ -21,11 +23,11 @@ function AppContent() {
         <Route path="/createpoll" element={<CreatePoll />} />
         <Route path="/signup" element={<SignupWithOTP />} />
         <Route path="/login" element={<LogInWithOTP />} />
-        {/* Add more routes here */}
         <Route path="/" element={<Home />} />
         <Route path="/livepolls" element={<LivePolls />} />
         <Route path="/expiredpolls" element={<ExpirePolls />} />
         <Route path="/viewyourpolls" element={<ViewYourPolls />} />
+        <Route path="/pollcandiadtes/:pollId" element={< CandidatePage/>} />
       </Routes>
     </>
   );

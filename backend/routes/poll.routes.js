@@ -6,7 +6,7 @@ const authenticateToken = require('../middleware/auth');
 const router = express.Router();
 router.post('/createpoll/:createdBy',  createPoll);
 router.post('/allpolls',allPolls);
-router.post('/allowedtovote/:userId',authenticateToken, allowedToVote  );
+router.post('/allowedtovote/:userId', allowedToVote  );
 router.post('/getyourpolls/:userId',  getYourPolls );
 router.post('/deleteyourpoll/:userId',  deletePoll );
 router.post('/edityourpoll/:userId',  editYourPoll );

@@ -28,6 +28,7 @@ const ExpirePolls = () => {
         .map((poll) => (
           <PollCard
             key={poll._id}
+            pollId={poll._id}
             name={poll.pollName}
             image={img}
             description={poll.description}

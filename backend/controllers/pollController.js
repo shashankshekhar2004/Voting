@@ -1,7 +1,7 @@
 const pollModel = require('../models/voting');
 const userModel = require('../models/user');
 const { v4: uuidv4 } = require('uuid');
-const otpModel=require('../models/otp')
+const otpModel = require('../models/otp')
 
 const createPoll = async (req, res) => {
     try {
@@ -50,39 +50,43 @@ const createPoll = async (req, res) => {
 const allowedToVote = async (req, res) => {
     const { userId } = req.params;
     const { pollId } = req.body;
-
     const user = await userModel.findById(userId);
     if (!user) {
-        return res.status(404).json({ error: 'User not found' });
+        return res.status(404).json({ allowedToVote: false, message: 'User not found' });
     }
+    // console.log("user founded",user)
 
     const poll = await pollModel.findById(pollId);
     if (!poll) {
-        return res.status(404).json({ error: 'Poll not found' });
+        return res.status(404).json({ allowedToVote: false, message: 'Poll not found' });
     }
+   // console.log("poll founded", poll)
 
     if (poll.expiryDate < new Date()) {
-        return res.status(403).json({ error: 'Poll has expired' });
+        return res.status(403).json({ allowedToVote: false, message: 'Poll has expired' });
     }
 
 
     //  Check if user already voted
-    const hasVoted = poll.voters.find(voter => voter.voterId.toString() === id);
-    if (hasVoted) {
-        return res.status(403).json({
+    const hasVoted = poll.voters.find(voter => voter.voterId.toString() === userId);
+    console.log(hasVoted.votedTo);
+    if (hasVoted.votedTo!== null) {
+        return res.json({
             status: 200,
-            error: 'You have already voted',
-            alreadyVoted: true,
-            candidateUUID:hasVoted.votedTo
+            message: 'You have already voted',
+            allowedToVote: false,
+            candidateUUID: hasVoted.votedTo, allowedToVote: false
         });
     }
+    console.log("user has not voted yet")
 
 
-    if (poll.openToAll === true ) {
+    if (poll.openToAll === true) {
         return res.send({
             success: true,
             status: 200,
-            message: "You are allowed to vote"
+            message: "You are allowed to vote",
+            allowedToVote: true,
         });
     }
 
@@ -90,25 +94,37 @@ const allowedToVote = async (req, res) => {
     const rollNumber = email.split('@')[0]; // Extract roll number
     const domain = email.split('@')[1]; // Extract domain
 
+    // console.log(rollNumber, domain, poll.allowedDomains);
+
     const allowedRangeFrom = poll.allowedRollRange.from, allowedRangeTo = poll.allowedRollRange.to;
 
-    if(allowedRangeFrom === "*" && "*" === allowedRangeTo && domain === poll.allowedDomains){
+    console.log(allowedRangeFrom, allowedRangeTo, domain, poll.allowedDomains);
+
+    if (allowedRangeFrom === "*" && "*" === allowedRangeTo && domain === poll.allowedDomains) {
         return res.send({
             success: true,
             status: 200,
-            message: "You are allowed to vote"
+            message: "You are allowed to vote",
+            allowedToVote: true
         });
     }
-    else if( rollNumber >= allowedRangeFrom && rollNumber <= allowedRangeTo && domain === poll.allowedDomains  ){
+    else if (rollNumber >= allowedRangeFrom && rollNumber <= allowedRangeTo && domain === poll.allowedDomains) {
         return res.send({
             success: true,
             status: 200,
-            message: "You are allowed to vote"
-        }); 
-    } 
-    else {
-        return res.status(403).json({ error: "You are not in the allowed roll number range" });
+            message: "You are allowed to vote",
+            allowedToVote: true
+        });
     }
+    else {
+        return res.send({
+            success: true,
+            status: 200,
+            message: "You are not allowed to vote",
+            allowedToVote: false
+        })
+    }
+
 };
 
 
@@ -198,16 +214,11 @@ const allPolls = async (req, res) => {
 
 
 
-
-
-
-
-
-
 const castVote = async (req, res) => {
     try {
         const { id } = req.params;
         const { pollId, candidateId, otp } = req.body;
+        console.log(otp, pollId, candidateId, id);
 
         // 1. Find user
         const user = await userModel.findById(id);
@@ -272,21 +283,21 @@ const castVote = async (req, res) => {
     }
 };
 
-const getYourPolls=async(req,res)=>{
-    try{
-        const {userId}=req.params;
-        if(!userId){
-            return res.status(400).json({status:400,message:"User ID is required"});
+const getYourPolls = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        if (!userId) {
+            return res.status(400).json({ status: 400, message: "User ID is required" });
         }
-        const polls=await pollModel.find({createdBy:userId});
-        return res.send({status:200,polls});
-        
+        const polls = await pollModel.find({ createdBy: userId });
+        return res.send({ status: 200, polls });
+
     }
-    catch(error){
+    catch (error) {
         console.error("Error while getting your polls:", error);
     }
 }
 
 
 
-module.exports = { createPoll, allPolls, allowedToVote,castVote,getYourPolls,deletePoll,editYourPoll }
+module.exports = { createPoll, allPolls, allowedToVote, castVote, getYourPolls, deletePoll, editYourPoll }

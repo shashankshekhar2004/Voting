@@ -38,6 +38,7 @@ const LivePolls = () => {
               image={img}
               description={poll.description}
               expiryDate={poll.expiryDate}
+              pollId={poll._id}
             />
           ))}
       </div>

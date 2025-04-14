@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import toast,{Toaster} from "react-hot-toast";
 
 const CreatePoll = () => {
   const [pollData, setPollData] = useState({
@@ -80,15 +81,16 @@ const CreatePoll = () => {
         payload
       );
       console.log("Poll created:", res.data);
-      alert("Poll created successfully!");
+      toast.success("Poll created successfully!");
     } catch (error) {
       console.error("Failed to create poll:", error);
-      alert("Poll creation failed");
+      toast.error("Poll creation failed!");
     }
   };
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded mt-6">
+      <Toaster position="top-center" />
       <h2 className="text-2xl font-bold mb-4">Create a Poll</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input

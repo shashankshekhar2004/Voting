@@ -59,6 +59,7 @@ const SlidingNavbar = () => {
           <Link to="/createpoll" className="hover:text-blue-500">
             create poll
           </Link>
+          
           <Link to="#" className="hover:text-blue-500">
             Contact
           </Link>

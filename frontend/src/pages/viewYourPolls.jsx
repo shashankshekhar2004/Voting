@@ -16,6 +16,7 @@ const ViewYourPolls = () => {
           `http://localhost:8000/api/v2/getyourpolls/${userId}`
         );
         setPolls(response.data.polls);
+        console.log("Fetched polls:", response.data.polls);
       } catch (error) {
         console.error("Error fetching polls:", error);
       }
@@ -51,6 +52,7 @@ const ViewYourPolls = () => {
           >
             <PollCard
               name={poll.pollName}
+              pollId={poll._id}
               image={img}
               description={poll.description}
               expiryDate={poll.expiryDate}

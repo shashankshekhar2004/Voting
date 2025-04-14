@@ -60,8 +60,8 @@ const pollSchema = new mongoose.Schema({
         required: true
     },
     allowedRollRange: {
-        from: { type: String },
-        to: { type: String }
+        from: { type: String,default:"*" },
+        to: { type: String ,default:"*"}
     },
     allowedDomains: {
         type: String,
