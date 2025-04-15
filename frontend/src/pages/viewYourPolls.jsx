@@ -7,16 +7,27 @@ import { useNavigate } from "react-router-dom";
 const ViewYourPolls = () => {
   const [polls, setPolls] = useState([]);
   const navigate = useNavigate();
+  const userId = localStorage.getItem("id");
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchPoll = async () => {
       try {
-        const userId = localStorage.getItem("id");
         const response = await axios.post(
-          `http://localhost:8000/api/v2/getyourpolls/${userId}`
+          `http://localhost:8000/api/v2/getyourpolls/${userId}`,
+          {},
+          {
+            headers: {
+              authorization: `${token}`,
+            },
+          }
         );
+        if (response.data.loginStatus === 0) {
+          toast.error("Login first");
+          navigate("/login");
+        }
         setPolls(response.data.polls);
-        console.log("Fetched polls:", response.data.polls);
+        //console.log("Fetched polls:", response.data.polls);
       } catch (error) {
         console.error("Error fetching polls:", error);
       }
@@ -26,15 +37,32 @@ const ViewYourPolls = () => {
 
   const handleDelete = async (pollId) => {
     try {
-      await axios.delete(`http://localhost:8000/api/v2/deletepoll/${pollId}`);
+      // console.log(pollId);
+      // console.log(userId);
+      const response = await axios.delete(
+        `http://localhost:8000/api/v2/deleteyourpoll/${userId}`,
+        {
+          headers: {
+            authorization: `${token}`,
+          },
+          data: { pollId },
+        }
+      );
+      if (response.data.loginStatus === 0) {
+        toast.error("Login first");
+        navigate("/login");
+      }
+      //  console.log(response);
       setPolls((prevPolls) => prevPolls.filter((poll) => poll._id !== pollId));
     } catch (error) {
       console.error("Error deleting poll:", error);
     }
   };
 
-  const handleEdit = (pollId) => {
-    navigate(`/editpoll/${pollId}`);
+  const handleEdit = (poll) => {
+    navigate(`/edityourpoll`, {
+      state: { poll },
+    });
   };
 
   return (
@@ -48,7 +76,7 @@ const ViewYourPolls = () => {
         .map((poll) => (
           <div
             key={poll._id}
-            className="flex flex-col items-stretch bg-zinc-700  rounded-2xl overflow-hidden shadow-md"
+            className="flex flex-col h-[60vh] items-center bg-zinc-700  rounded-2xl overflow-hidden shadow-md"
           >
             <PollCard
               name={poll.pollName}
@@ -56,10 +84,11 @@ const ViewYourPolls = () => {
               image={img}
               description={poll.description}
               expiryDate={poll.expiryDate}
+              totalVotes={poll.totalVotes}
             />
             <div className="flex justify-center gap-4 p-4 bg-zinc-700 ">
               <button
-                onClick={() => handleEdit(poll._id)}
+                onClick={() => handleEdit(poll)}
                 className="px-4 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
               >
                 Edit

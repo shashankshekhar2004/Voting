@@ -1,57 +1,66 @@
-const { Resend } = require('resend');
-const resend = new Resend(process.env.OTP_API);
+
 const otpModel = require('../models/otp')
-const axios = require('axios');
 const nodemailer = require('nodemailer');
+const jwt = require('jsonwebtoken');
 
 
-const sendOtpHandler = async (req, res, next) => {
-  const { email } = req.body;
+const sendOtpHandler = async (req, res) => {
+  const { token } = req.body;
+  var email = req.body.email;
+
   const otp = Math.floor(1000 + Math.random() * 9000);
+
+  if (!email) {
+    try {
+      console.log("here")
+      const decoded = jwt.verify(token, process.env.SECRET_KEY);
+      email = decoded.email;
+    } catch (error) {
+      return res.send({ success: false, message: "Invalid token" });
+    }
+  }
 
   try {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
         user: 'princeshashank034037@gmail.com',
-        pass: process.env.smtp, // Use Gmail App Password if 2FA is enabled
+        pass: process.env.smtp,
       },
     });
 
-
-    // Email options
     const mailOptions = {
       from: 'princeshashank034037@gmail.com',
       to: email,
       subject: 'Your OTP Code',
-      text:`Hi! Your OTP is: ${otp}`,
+      text: `Hi! Your OTP is: ${otp}`,
     };
 
-    // Send email
-    transporter.sendMail(mailOptions, (error, info) => {
+    transporter.sendMail(mailOptions, async (error, info) => {
       if (error) {
         console.error('Error sending OTP:', error);
+        return res.status(500).send({ success: false, message: 'Failed to send OTP' });
       } else {
-        console.log('OTP sent:',otp, info.response);
-         res.send({
+        console.log('OTP sent:', otp, info.response);
+
+        await otpModel.deleteOne({ email }); // Clean up any old OTP
+        const otpObject = new otpModel({ email, otp });
+        await otpObject.save();
+
+        return res.send({
           status: 1,
           success: true,
-          message: 'OTP sent via Gmail',
-        })
+          message: 'OTP sent via Gmail and saved',
+        });
       }
     });
-    const IsOtpPresent = await otpModel.findOne({ email: email });
-    if(IsOtpPresent){
-      await otpModel.deleteOne({ email: email });
-    }
-    const otpObject=new otpModel({email:email,otp:otp});
-    await otpObject.save();
-    return res.send({success:true,message:"otp saved"})
-    
+
   } catch (error) {
-    console.log(error)
+    console.log(error);
+    return res.status(500).send({ success: false, message: "Server error" });
   }
-}
+};
+
 
 
 module.exports = sendOtpHandler;

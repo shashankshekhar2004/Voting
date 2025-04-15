@@ -1,40 +1,57 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { BarChart3, Clock } from "lucide-react";
 
-const PollCard = ({ name, image, description, expiryDate, pollId }) => {
+const PollCard = ({ name, image, expiryDate, pollId, totalVotes }) => {
   const navigate = useNavigate();
+  const isExpired = new Date(expiryDate) < new Date();
 
   const handleVoteClick = () => {
     navigate(`/pollcandiadtes/${pollId}`);
   };
 
   const handleResultClick = () => {
-    navigate(`/result/${pollId}`);
+    navigate(`/pollcandiadtes/${pollId}`);
   };
 
-  const isExpired = new Date(expiryDate) < new Date();
-
   return (
-    <div className="bg-white rounded-xl shadow-lg p-5 flex flex-col items-center text-center">
-      <img src={image} alt={name} className="w-48 h-32 object-cover mb-4 rounded-md" />
-      <h2 className="text-xl font-bold mb-2">{name}</h2>
-      <p className="text-sm text-gray-600 mb-2">{description}</p>
-      <p className="text-xs text-gray-400 mb-4">Expires on: {new Date(expiryDate).toLocaleDateString()}</p>
-      {isExpired ? (
+    <div className="bg-white h-[50vh] dark:bg-gray-900 rounded-3xl shadow-xl overflow-hidden w-full max-w-sm hover:scale-[1.01] transition-all duration-300">
+      {/* Image */}
+      <img src={image} alt={name} className="w-full h-40 object-cover" />
+
+      {/* Content */}
+      <div className="p-5 flex flex-col gap-2">
+        <h2 className="text-xl font-bold text-gray-800 dark:text-white">
+          {name}
+        </h2>
+        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mt-2">
+          <span className="flex items-center gap-1">
+            <Clock className="w-4 h-4" />
+            {new Date(expiryDate).toLocaleString()}
+          </span>
+          <span className="flex items-center gap-1">
+            <BarChart3 className="w-4 h-4" />
+            {totalVotes} Votes
+          </span>
+        </div>
+
+        {isExpired && (
+          <span className="mt-2 px-3 py-1 text-xs text-red-600 bg-red-100 dark:bg-red-800 dark:text-red-200 rounded-md self-start font-medium">
+            Poll Expired
+          </span>
+        )}
+
         <button
-          onClick={handleResultClick}
-          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200"
+          onClick={isExpired ? handleResultClick : handleVoteClick}
+          className={`mt-4 w-full py-2 rounded-lg text-white font-semibold transition duration-200 ${
+            isExpired
+              ? "bg-green-600 hover:bg-green-700"
+              : "bg-indigo-600 hover:bg-indigo-700"
+          }`}
         >
-          Show Result
+          {isExpired ? "Show Result" : "Cast Vote"}
         </button>
-      ) : (
-        <button
-          onClick={handleVoteClick}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-200"
-        >
-          Cast Vote 
-        </button>
-      )}
+      </div>
     </div>
   );
 };

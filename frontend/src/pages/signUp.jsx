@@ -1,9 +1,10 @@
 import axios from "axios";
 import React, { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const SignupWithOTP = () => {
+  const navigate = useNavigate();
   const [otpSent, setOtpSent] = useState(false);
   const [form, setForm] = useState({
     name: "",
@@ -60,6 +61,7 @@ const SignupWithOTP = () => {
         toast.success(response.data.message);
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("id", response.data.id);
+        navigate("/");
       } else toast.error(response.data.message);
     } catch (error) {
       console.log(error);

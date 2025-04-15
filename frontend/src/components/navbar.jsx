@@ -1,9 +1,26 @@
 import React, { useState } from "react";
-import { Menu, X } from "lucide-react";
-import { Link } from "react-router-dom";
+import {
+  Menu,
+  X,
+  ListChecks,
+  Hourglass,
+  History,
+  UserSquare,
+  Plus,
+  Phone,
+  LogOut,
+} from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 
 const SlidingNavbar = () => {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("id");
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
 
   return (
     <div className="relative">
@@ -18,7 +35,7 @@ const SlidingNavbar = () => {
       {/* Overlay */}
       {open && (
         <div
-          className="fixed inset-0   bg-opacity-0 z-40"
+          className="fixed inset-0 bg-opacity-0 z-40"
           onClick={() => setOpen(false)}
         />
       )}
@@ -29,41 +46,72 @@ const SlidingNavbar = () => {
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        {/* Close Button */}
-        <div className="flex justify-between items-center p-4 border-b border-gray-300 dark:border-gray-700">
-          <h2 className="text-lg font-bold text-gray-800 dark:text-white">
-            Menu
-          </h2>
-          <button onClick={() => setOpen(false)}>
-            <X className="text-gray-700 dark:text-white" />
-          </button>
-        </div>
+        <div className="flex flex-col justify-between h-full">
+          <div>
+            {/* Close Button */}
+            <div className="flex justify-between items-center p-4 border-b border-gray-300 dark:border-gray-700">
+              <h2 className="text-lg font-bold text-gray-800 dark:text-white">
+                Menu
+              </h2>
+              <button onClick={() => setOpen(false)}>
+                <X className="text-gray-700 dark:text-white" />
+              </button>
+            </div>
 
-        {/* Links */}
-        <nav
-          onClick={() => setOpen(false)}
-          className="flex flex-col  p-4 space-y-3 text-gray-700 dark:text-white"
-        >
-          <Link to="/" className="hover:text-blue-500">
-            All Polls
-          </Link>
-          <Link to="/livepolls" className="hover:text-blue-500">
-            Live Polls
-          </Link>
-          <Link to="/expiredpolls" className="hover:text-blue-500">
-            Expired Polls
-          </Link>
-          <Link to="/viewyourpolls" className="hover:text-blue-500">
-            View Your Polls
-          </Link>
-          <Link to="/createpoll" className="hover:text-blue-500">
-            create poll
-          </Link>
-          
-          <Link to="#" className="hover:text-blue-500">
-            Contact
-          </Link>
-        </nav>
+            {/* Links */}
+            <nav
+              onClick={() => setOpen(false)}
+              className="flex flex-col p-4 space-y-4 text-gray-700 dark:text-white"
+            >
+              <Link
+                to="/"
+                className="flex items-center gap-2 hover:text-blue-500"
+              >
+                <ListChecks size={18} /> All Polls
+              </Link>
+              <Link
+                to="/livepolls"
+                className="flex items-center gap-2 hover:text-blue-500"
+              >
+                <Hourglass size={18} /> Live Polls
+              </Link>
+              <Link
+                to="/expiredpolls"
+                className="flex items-center gap-2 hover:text-blue-500"
+              >
+                <History size={18} /> Expired Polls
+              </Link>
+              <Link
+                to="/viewyourpolls"
+                className="flex items-center gap-2 hover:text-blue-500"
+              >
+                <UserSquare size={18} /> View Your Polls
+              </Link>
+              <Link
+                to="/createpoll"
+                className="flex items-center gap-2 hover:text-blue-500"
+              >
+                <Plus size={18} /> Create Poll
+              </Link>
+              <Link
+                to="#"
+                className="flex items-center gap-2 hover:text-blue-500"
+              >
+                <Phone size={18} /> Contact
+              </Link>
+            </nav>
+          </div>
+
+          {/* Logout Button */}
+          <div className="p-4 border-t border-gray-300 dark:border-gray-700">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-2 text-red-600 dark:text-red-400 hover:text-red-700"
+            >
+              <LogOut size={18} /> Logout
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

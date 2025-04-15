@@ -1,21 +1,27 @@
-import React, { useState } from 'react'
-import person from '../assets/person.jpeg'
-import toast, { Toaster } from 'react-hot-toast'
-import axios from 'axios'
+import React, { useState } from "react";
+import person from "../assets/person.jpeg";
+import toast, { Toaster } from "react-hot-toast";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-const CandidateCard = ({ candidate, pollId }) => {
+const CandidateCard = ({ candidate, pollId, expiryDate }) => {
   const {
     candidateName,
     description,
     votes: initialVotes,
     candidateId,
-    candiadateImageUrl
-  } = candidate
+    candiadateImageUrl,
+  } = candidate;
+  const navigate = useNavigate();
   const userId = localStorage.getItem("id");
-
-  const [votes, setVotes] = useState(initialVotes)
+  const [votes, setVotes] = useState(initialVotes);
   const [showOtpInput, setShowOtpInput] = useState(false);
-  const [otp, setOtp] = useState('');
+  const [otp, setOtp] = useState("");
+  const token = localStorage.getItem("token");
+
+  // Check if poll is expired
+
+  const isExpired = new Date(expiryDate) < new Date();
 
   const handleVote = async () => {
     try {
@@ -24,25 +30,30 @@ const CandidateCard = ({ candidate, pollId }) => {
         return;
       }
 
-
       const response = await axios.post(
         `http://localhost:8000/api/v2/allowedtovote/${userId}`,
-        { pollId }
+        { pollId },
+        {
+          headers: {
+            authorization: `${token}`,
+          },
+        }
       );
-
+      //console.log(response.data);
+      if (response.data.loginStatus === 0) {
+        toast.error("Login first");
+        navigate("/login");
+      }
 
       const { allowedToVote, message } = response.data;
-      console.log(allowedToVote, message);
+      //console.log(allowedToVote, message);
       const email = localStorage.getItem("email");
+
+      toast.dismiss();
       if (allowedToVote) {
-        setShowOtpInput(true); 
-        const response = await axios.post(
-          "http://localhost:8000/api/v1/sendotp",
-          { email: email }
-        );
-
+        setShowOtpInput(true);
+        await axios.post("http://localhost:8000/api/v1/sendotp", { token });
         toast.success("Otp sent successfully!");
-
       } else {
         toast.error(message);
       }
@@ -50,7 +61,7 @@ const CandidateCard = ({ candidate, pollId }) => {
       console.error("Error checking voting permission:", error);
       toast.error("Something went wrong");
     }
-  }
+  };
 
   const handleOtpSubmit = async () => {
     try {
@@ -58,42 +69,67 @@ const CandidateCard = ({ candidate, pollId }) => {
         toast.error("Please enter OTP");
         return;
       }
+
       const response = await axios.post(
         `http://localhost:8000/api/v2/castvote/${userId}`,
-        { pollId:pollId,otp:otp,candidateId: candidate.candidateId }
+        {
+          pollId,
+          otp,
+          candidateId: candidate.candidateId,
+        },
+        {
+          headers: {
+            authorization: `${token}`,
+          },
+        }
       );
+      //console.log(response.data);
+      if (response.data.loginStatus === 0) {
+        toast.error("Login first");
+        navigate("/login");
+      }
 
       console.log(response.data);
       toast.success(response.data.message);
       setVotes(response.data.votes);
-
       setShowOtpInput(false);
     } catch (err) {
-      console.log(err)
+      console.log(err);
       toast.error("OTP verification failed");
     }
-  }
+  };
 
   return (
-    <div className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 w-80 p-5 flex flex-col items-center text-center relative">
+    <div className="bg-white rounded-2xl h-[50vh] shadow-md hover:shadow-xl transition-shadow duration-300 w-80 p-5 flex flex-col items-center text-center relative">
       <Toaster position="top-center" />
       <img
         src={person}
         alt={candidateName}
         className="w-32 h-32 object-cover rounded-full border-4 border-gray-200 mb-4"
       />
-      <h2 className="text-2xl font-semibold text-gray-800 mb-1">{candidateName}</h2>
+      <h2 className="text-2xl font-semibold text-gray-800 mb-1">
+        {candidateName}
+      </h2>
       <p className="text-sm text-gray-500 mb-3">{description}</p>
       <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
-        <span className="font-medium">Votes:</span>
-        <span className="font-bold text-indigo-600">{votes}</span>
+        <span className=" text-2xl font-medium">Votes:</span>
+        <span className="font-bold text-2xl text-indigo-600">{votes}</span>
       </div>
-      <button
-        onClick={handleVote}
-        className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-200"
-      >
-        Cast Vote
-      </button>
+
+      {!isExpired && (
+        <button
+          onClick={handleVote}
+          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-indigo-700 transition duration-200"
+        >
+          Cast Vote
+        </button>
+      )}
+
+      {isExpired && (
+        <span className="block mt-2 text-sm font-medium text-red-600 bg-red-100 p-2 rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105">
+          This poll has expired
+        </span>
+      )}
 
       {/* OTP Modal */}
       {showOtpInput && (
@@ -123,7 +159,7 @@ const CandidateCard = ({ candidate, pollId }) => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default CandidateCard
+export default CandidateCard;

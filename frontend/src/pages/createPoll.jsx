@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios";
-import toast,{Toaster} from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const CreatePoll = () => {
+  const navigate = useNavigate();
   const [pollData, setPollData] = useState({
     pollName: "",
     pollImageUrl: "",
@@ -10,7 +12,7 @@ const CreatePoll = () => {
     expiryDate: "",
     openToAll: true,
     allowedDomains: "",
-    domainAccessType: "all", // 'all' or 'range'
+    domainAccessType: "all",
     allowedRollRange: {
       from: "",
       to: "",
@@ -76,10 +78,20 @@ const CreatePoll = () => {
 
     try {
       const userId = localStorage.getItem("id");
+      const token = localStorage.getItem("token");
       const res = await axios.post(
         `http://localhost:8000/api/v2/createpoll/${userId}`,
-        payload
+        payload,
+        {
+          headers: {
+            authorization: `${token}`,
+          },
+        }
       );
+      if (res.data.loginStatus === 0) {
+        toast.error("Login first");
+        navigate("/login");
+      }
       console.log("Poll created:", res.data);
       toast.success("Poll created successfully!");
     } catch (error) {

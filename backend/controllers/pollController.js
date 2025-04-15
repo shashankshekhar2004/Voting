@@ -63,14 +63,15 @@ const allowedToVote = async (req, res) => {
    // console.log("poll founded", poll)
 
     if (poll.expiryDate < new Date()) {
-        return res.status(403).json({ allowedToVote: false, message: 'Poll has expired' });
+        return res.json({ allowedToVote: false, message: 'Poll has expired' });
     }
 
 
     //  Check if user already voted
     const hasVoted = poll.voters.find(voter => voter.voterId.toString() === userId);
-    console.log(hasVoted.votedTo);
-    if (hasVoted.votedTo!== null) {
+    //console.log(hasVoted)
+    //console.log(hasVoted.votedTo);
+    if (hasVoted) {
         return res.json({
             status: 200,
             message: 'You have already voted',
@@ -78,7 +79,7 @@ const allowedToVote = async (req, res) => {
             candidateUUID: hasVoted.votedTo, allowedToVote: false
         });
     }
-    console.log("user has not voted yet")
+    //console.log("user has not voted yet")
 
 
     if (poll.openToAll === true) {
@@ -98,7 +99,7 @@ const allowedToVote = async (req, res) => {
 
     const allowedRangeFrom = poll.allowedRollRange.from, allowedRangeTo = poll.allowedRollRange.to;
 
-    console.log(allowedRangeFrom, allowedRangeTo, domain, poll.allowedDomains);
+    //console.log(allowedRangeFrom, allowedRangeTo, domain, poll.allowedDomains);
 
     if (allowedRangeFrom === "*" && "*" === allowedRangeTo && domain === poll.allowedDomains) {
         return res.send({
@@ -132,6 +133,7 @@ const deletePoll = async (req, res) => {
     try {
         const { userId } = req.params;
         const { pollId } = req.body;
+        console.log(userId,pollId)
 
         const poll = await pollModel.findById(pollId);
         if (!poll) {
@@ -155,48 +157,94 @@ const deletePoll = async (req, res) => {
 
 
 
+// const editYourPoll = async (req, res) => {
+//     try {
+//         const { pollId, pollData } = req.body;
+
+//         // Find the poll
+//         const poll = await pollModel.findById(pollId);
+//         if (!poll) {
+//             return res.status(404).json({ status: false, error: 'Poll not found.' });
+//         }
+
+//         // Check if the user is the creator
+//         // // if (poll.createdBy.toString() !== userId) {
+//         //     return res.status(403).json({ status: false, error: 'You are not authorized to edit this poll.' });
+//         // }
+
+//         // Allowed fields to update
+//         const updatableFields = [
+//             'pollName',
+//             'candidatesArray',
+//             'pollImageUrl',
+//             'expiryDate',
+//             'openToAll',
+//             'allowedRollRange',
+//             'allowedDomains'
+//         ];
+
+//         // Apply updates safely
+//         updatableFields.forEach(field => {
+//             if (pollData[field] !== undefined) {
+//                 poll[field] = pollData[field];
+//             }
+//         });
+
+//         await poll.save();
+
+//         return res.status(200).json({ status: true, message: 'Poll updated successfully.', updatedPoll: poll });
+//     } catch (error) {
+//         console.error(error);
+//         return res.status(500).json({ status: false, error: 'Something went wrong while updating the poll.' });
+//     }
+// };
+
 const editYourPoll = async (req, res) => {
     try {
-        const { pollId, pollData } = req.body;
-
-        // Find the poll
-        const poll = await pollModel.findById(pollId);
-        if (!poll) {
-            return res.status(404).json({ status: false, error: 'Poll not found.' });
-        }
-
-        // Check if the user is the creator
-        // // if (poll.createdBy.toString() !== userId) {
-        //     return res.status(403).json({ status: false, error: 'You are not authorized to edit this poll.' });
-        // }
-
-        // Allowed fields to update
-        const updatableFields = [
-            'pollName',
-            'candidatesArray',
-            'pollImageUrl',
-            'expiryDate',
-            'openToAll',
-            'allowedRollRange',
-            'allowedDomains'
-        ];
-
-        // Apply updates safely
-        updatableFields.forEach(field => {
-            if (pollData[field] !== undefined) {
-                poll[field] = pollData[field];
+      const { pollId } = req.params;
+      const {
+        pollName,
+        pollImageUrl,
+        expiryDate,
+        candidatesArray
+      } = req.body;
+  
+      const poll = await pollModel.findById(pollId);
+      if (!poll) {
+        return res.status(404).json({ error: 'Poll not found' });
+      }
+  
+      // Update poll-level fields
+      if (pollName) poll.pollName = pollName;
+      if (pollImageUrl) poll.pollImageUrl = pollImageUrl;
+      if (expiryDate) poll.expiryDate = expiryDate;
+  
+      // Update candidates
+      if (Array.isArray(candidatesArray)) {
+        candidatesArray.forEach(updatedCandidate => {
+          const existingCandidate = poll.candidatesArray.find(
+            c => c.candidateId === updatedCandidate.candidateId
+          );
+          if (existingCandidate) {
+            if (updatedCandidate.description) {
+              existingCandidate.description = updatedCandidate.description;
             }
+            if (updatedCandidate.candiadateImageUrl) {
+              existingCandidate.candiadateImageUrl = updatedCandidate.candiadateImageUrl;
+            }
+          }
         });
-
-        await poll.save();
-
-        return res.status(200).json({ status: true, message: 'Poll updated successfully.', updatedPoll: poll });
+      }
+  
+      await poll.save();
+      return res.status(200).json({ message: 'Poll updated successfully', poll });
+  
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ status: false, error: 'Something went wrong while updating the poll.' });
+      console.error("Error updating poll:", error);
+      res.status(500).json({ message: 'Server error while updating poll' });
     }
-};
-
+  };
+  
 
 
 
