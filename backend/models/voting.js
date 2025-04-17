@@ -26,14 +26,13 @@ const pollSchema = new mongoose.Schema({
             type: Number,
             default: 0
         },
-        candiadateImageUrl: {
-            type: String,
-            default: "candidate image"
+        candidateImageUrl: {
+            type: String,default:"https://res.cloudinary.com/daj5o8tyu/image/upload/v1744885246/polls/1744885247881-person.jpg"
         }
     }],
     pollImageUrl: {
         type: String,
-        default: "Nit Jsr Image"
+        default: "https://res.cloudinary.com/daj5o8tyu/image/upload/v1744885245/polls/1744885244855-poll.jpg"
     },
     voters: [{
         voterId: {

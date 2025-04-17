@@ -16,8 +16,12 @@ const PollCard = ({ name, image, expiryDate, pollId, totalVotes }) => {
 
   return (
     <div className="bg-white h-[50vh] dark:bg-gray-900 rounded-3xl shadow-xl overflow-hidden w-full max-w-sm hover:scale-[1.01] transition-all duration-300">
-      {/* Image */}
-      <img src={image} alt={name} className="w-full h-40 object-cover" />
+      {/* Cloudinary Image */}
+      <img
+        src={image}
+        alt={name}
+        className="w-full h-40 object-cover"
+      />
 
       {/* Content */}
       <div className="p-5 flex flex-col gap-2">

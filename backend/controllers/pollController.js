@@ -20,6 +20,7 @@ const createPoll = async (req, res) => {
         candidatesArray.forEach(candidate => {
             candidate.candidateId = uuidv4();
         });
+        // console.log(candidatesArray);
 
 
         const pollData = {
@@ -37,6 +38,7 @@ const createPoll = async (req, res) => {
         }
 
         const poll = new pollModel(pollData);
+        console.log(poll)
         await poll.save();
 
         return res.status(201).json({ message: 'Poll created successfully', poll });

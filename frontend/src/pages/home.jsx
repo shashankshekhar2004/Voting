@@ -26,7 +26,6 @@ const Home = () => {
           toast.error("Login first");
           navigate("/login");
         }
-        // console.log(response.data.description);
         setPolls(response.data.polls);
       } catch (error) {
         console.error("Error fetching polls:", error);
@@ -48,7 +47,7 @@ const Home = () => {
           <PollCard
             key={poll._id}
             name={poll.pollName}
-            image={img}
+            image={poll.pollImageUrl }
             expiryDate={poll.expiryDate}
             pollId={poll._id}
             totalVotes={poll.totalVotes}

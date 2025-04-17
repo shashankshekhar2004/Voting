@@ -5,10 +5,11 @@ import { useNavigate } from "react-router-dom";
 
 const CreatePoll = () => {
   const navigate = useNavigate();
+
   const [pollData, setPollData] = useState({
     pollName: "",
-    pollImageUrl: "",
     description: "",
+    pollImageUrl: "",
     expiryDate: "",
     openToAll: true,
     allowedDomains: "",
@@ -21,10 +22,13 @@ const CreatePoll = () => {
       {
         candidateName: "",
         description: "",
-        candiadateImageUrl: "",
+        candidateImageUrl: "",
       },
     ],
   });
+
+  const [pollImage, setPollImage] = useState(null);
+  const [candidateImages, setCandidateImages] = useState([]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -60,7 +64,7 @@ const CreatePoll = () => {
         {
           candidateName: "",
           description: "",
-          candiadateImageUrl: "",
+          candidateImageUrl: "",
         },
       ],
     });
@@ -68,34 +72,86 @@ const CreatePoll = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const payload = {
-      ...pollData,
-      allowedRange:
-        !pollData.openToAll && pollData.domainAccessType === "range"
-          ? pollData.allowedRollRange
-          : undefined,
-    };
 
     try {
       const userId = localStorage.getItem("id");
       const token = localStorage.getItem("token");
+
+      // Upload poll image
+      if (pollImage) {
+        const PollImgData = new FormData();
+        PollImgData.append("image", pollImage);
+
+        const pollImgResponse = await axios.post(
+          "http://localhost:8000/api/v2/imageUpload",
+          PollImgData,
+          {
+            headers: {
+              authorization: `${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        console.log(pollImgResponse.data.imageUrl)
+        pollData.pollImageUrl = pollImgResponse.data.imageUrl;
+      }
+
+      // Upload candidate images
+      if (candidateImages.length > 0) {
+        for (let i = 0; i < candidateImages.length; i++) {
+          var candidateFormData = new FormData();
+          candidateFormData.append("image", candidateImages[i]);
+
+          const candidateImgResponse = await axios.post(
+            "http://localhost:8000/api/v2/imageUpload",
+            candidateFormData,
+            {
+              headers: {
+                authorization: `${token}`,
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+          // console.log(candidateImgResponse.data.imageUrl)
+          // console.log(candidateImgResponse.data)
+          pollData.candidatesArray[i].candidateImageUrl = candidateImgResponse.data.imageUrl;
+          // console.log(pollData.candidatesArray[i].candidateImageUrl)
+        }
+      }
+
+      const payload = {
+        pollName: pollData.pollName,
+        pollImageUrl: pollData.pollImageUrl,
+        description: pollData.description,
+        expiryDate: pollData.expiryDate,
+        openToAll: pollData.openToAll,
+        allowedDomains: pollData.allowedDomains,
+        domainAccessType: pollData.domainAccessType,
+        allowedRange:
+          !pollData.openToAll && pollData.domainAccessType === "range"
+            ? pollData.allowedRollRange
+            : undefined,
+        candidatesArray: pollData.candidatesArray,
+      };
+      console.log(payload);
+
       const res = await axios.post(
         `http://localhost:8000/api/v2/createpoll/${userId}`,
         payload,
         {
-          headers: {
-            authorization: `${token}`,
-          },
+          headers: { authorization: token },
         }
       );
+
       if (res.data.loginStatus === 0) {
         toast.error("Login first");
         navigate("/login");
+        return;
       }
-      console.log("Poll created:", res.data);
+
       toast.success("Poll created successfully!");
     } catch (error) {
-      console.error("Failed to create poll:", error);
+      console.error("Poll creation failed:", error);
       toast.error("Poll creation failed!");
     }
   };
@@ -116,11 +172,9 @@ const CreatePoll = () => {
         />
 
         <input
-          type="text"
-          name="pollImageUrl"
-          value={pollData.pollImageUrl}
-          onChange={handleInputChange}
-          placeholder="Poll Image URL"
+          type="file"
+          accept="image/*"
+          onChange={(e) => setPollImage(e.target.files[0])}
           className="w-full border p-2 rounded"
         />
 
@@ -170,7 +224,7 @@ const CreatePoll = () => {
                   type="radio"
                   name="domainAccessType"
                   value="all"
-                  checked={pollData.domainAccessType === "all"}
+                  checked={pollData.domainAccessType === "*"}
                   onChange={handleInputChange}
                 />
                 Allow all emails of this domain
@@ -180,14 +234,14 @@ const CreatePoll = () => {
                   type="radio"
                   name="domainAccessType"
                   value="range"
-                  checked={pollData.domainAccessType === "range"}
+                  checked={pollData.domainAccessType === "*"}
                   onChange={handleInputChange}
                 />
                 Allow only roll number range
               </label>
             </div>
 
-            {pollData.domainAccessType === "range" && (
+            {pollData.domainAccessType === "*" && (
               <div className="flex gap-4">
                 <input
                   type="text"
@@ -234,20 +288,18 @@ const CreatePoll = () => {
               required
             />
             <input
-              type="text"
-              placeholder="Candidate Image URL"
-              value={candidate.candiadateImageUrl}
-              onChange={(e) =>
-                handleCandidateChange(
-                  index,
-                  "candiadateImageUrl",
-                  e.target.value
-                )
-              }
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const updatedImages = [...candidateImages];
+                updatedImages[index] = e.target.files[0];
+                setCandidateImages(updatedImages);
+              }}
               className="w-full border p-2 rounded"
             />
           </div>
         ))}
+
         <button
           type="button"
           onClick={addCandidate}

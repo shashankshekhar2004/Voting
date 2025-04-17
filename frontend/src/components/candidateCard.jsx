@@ -10,7 +10,7 @@ const CandidateCard = ({ candidate, pollId, expiryDate }) => {
     description,
     votes: initialVotes,
     candidateId,
-    candiadateImageUrl,
+    candidateImageUrl,
   } = candidate;
   const navigate = useNavigate();
   const userId = localStorage.getItem("id");
@@ -103,7 +103,7 @@ const CandidateCard = ({ candidate, pollId, expiryDate }) => {
     <div className="bg-white rounded-2xl h-[50vh] shadow-md hover:shadow-xl transition-shadow duration-300 w-80 p-5 flex flex-col items-center text-center relative">
       <Toaster position="top-center" />
       <img
-        src={person}
+        src={candidateImageUrl}
         alt={candidateName}
         className="w-32 h-32 object-cover rounded-full border-4 border-gray-200 mb-4"
       />
