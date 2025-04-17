@@ -24,13 +24,14 @@ function AppContent() {
         <Route path="/createpoll" element={<CreatePoll />} />
         <Route path="/signup" element={<SignupWithOTP />} />
         <Route path="/login" element={<LogInWithOTP />} />
-        <Route path="/" element={<Home />} />
-        <Route path="/livepolls" element={<LivePolls />} />
+        <Route path="/allpolls" element={<Home />} />
+        <Route path="/" element={<LivePolls />} />
         <Route path="/expiredpolls" element={<ExpirePolls />} />
         <Route path="/viewyourpolls" element={<ViewYourPolls />} />
         <Route path="/pollcandiadtes/:pollId" element={<CandidatePage />} />
         <Route path="/edityourpoll" element={<EditYourPoll />} />
-      </Routes>
+        <Route path="*" element={<LivePolls />} />
+        </Routes>
     </>
   );
 }

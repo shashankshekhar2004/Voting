@@ -64,13 +64,13 @@ const SlidingNavbar = () => {
               className="flex flex-col p-4 space-y-4 text-gray-700 dark:text-white"
             >
               <Link
-                to="/"
+                to="/allpolls"
                 className="flex items-center gap-2 hover:text-blue-500"
               >
                 <ListChecks size={18} /> All Polls
               </Link>
               <Link
-                to="/livepolls"
+                to="/"
                 className="flex items-center gap-2 hover:text-blue-500"
               >
                 <Hourglass size={18} /> Live Polls
