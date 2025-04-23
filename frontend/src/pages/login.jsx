@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
+import img from "../assets/images.jpg";
 
 const LogInWithOTP = () => {
   const navigate = useNavigate();
@@ -65,79 +66,87 @@ const LogInWithOTP = () => {
   };
 
   return (
-    <div className="bg-gray-900">
-      <div className="h-[100vh] bg-gray-900 flex items-center justify-center px-4">
+    <div className="h-screen w-screen flex bg-gray-900">
+      {/* Left Image Section */}
+      <div className="hidden md:flex w-1/2 relative">
+        <img
+          src={img}
+          alt="Login Visual"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent" />
+        <div className="absolute bottom-10 left-10 text-white">
+          <h2 className="text-3xl font-bold">Welcome Back!</h2>
+          <p className="text-sm text-gray-300 mt-2">Hello!</p>
+        </div>
+      </div>
+
+      {/* Right Form Section */}
+      <div className="w-full md:w-1/2 flex items-center justify-center p-6 relative">
         <Toaster position="top-center" />
 
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md w-full max-w-sm">
-          <h2 className="text-xl font-bold text-center text-gray-800 dark:text-white mb-4">
-            Log In
-          </h2>
+        <div className="w-full max-w-md bg-white/10 backdrop-blur-lg border border-white/20 p-8 rounded-2xl shadow-xl text-white">
+          <h2 className="text-3xl font-bold text-center mb-6">Login</h2>
 
-          <div className="mb-3">
-            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
-              Email
-            </label>
+          {/* Email */}
+          <div className="mb-4">
+            <label className="text-sm font-medium">Email</label>
             <input
               type="email"
               name="email"
               value={form.email}
               onChange={handleChange}
-              className="w-full px-3 py-1.5 border rounded text-sm focus:outline-none dark:bg-gray-700 dark:text-white"
               placeholder="you@example.com"
+              className="mt-1 w-full px-4 py-2 bg-white/10 border border-white/30 rounded-lg outline-none text-sm text-white placeholder-gray-300"
             />
           </div>
 
-          <div className="mb-3">
-            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
-              Password
-            </label>
+          {/* Password */}
+          <div className="mb-4">
+            <label className="text-sm font-medium">Password</label>
             <input
               type="password"
               name="password"
               value={form.password}
               onChange={handleChange}
-              className="w-full px-3 py-1.5 border rounded text-sm focus:outline-none dark:bg-gray-700 dark:text-white"
               placeholder="••••••••"
+              className="mt-1 w-full px-4 py-2 bg-white/10 border border-white/30 rounded-lg outline-none text-sm text-white placeholder-gray-300"
             />
           </div>
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
-              OTP
-            </label>
-            <div className="flex">
+          {/* OTP */}
+          <div className="mb-6">
+            <label className="text-sm font-medium">OTP</label>
+            <div className="flex mt-1">
               <input
                 type="text"
                 name="otp"
                 value={form.otp}
                 onChange={handleChange}
                 placeholder="Enter OTP"
-                className="flex-1 px-3 py-1.5 border rounded-l text-sm focus:outline-none dark:bg-gray-700 dark:text-white"
+                className="flex-1 px-4 py-2 bg-white/10 border border-white/30 rounded-l-lg outline-none text-sm text-white placeholder-gray-300"
               />
               <button
                 onClick={sendOTP}
-                className="px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-r hover:bg-blue-700 transition"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-sm font-semibold rounded-r-lg transition"
               >
                 Send OTP
               </button>
             </div>
           </div>
 
+          {/* Login Button */}
           <button
             onClick={handleSubmit}
-            className="w-full bg-green-600 text-white py-2 rounded text-sm font-semibold hover:bg-green-700"
+            className="w-full bg-green-600 hover:bg-green-700 py-2 rounded-lg text-white text-sm font-semibold transition"
           >
             Log In
           </button>
 
           {/* Link to Sign Up */}
-          <p className="text-center text-sm text-gray-700 dark:text-white mt-4">
+          <p className="text-center text-sm text-gray-300 mt-5">
             Don’t have an account?{" "}
-            <Link
-              to="/signup"
-              className="text-blue-600 hover:underline dark:text-blue-400"
-            >
+            <Link to="/signup" className="text-blue-400 hover:underline">
               Create one
             </Link>
           </p>

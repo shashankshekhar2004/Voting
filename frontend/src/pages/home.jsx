@@ -35,7 +35,7 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="p-6 bg-gradient-to-r 	bg-zinc-800 grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+    <div className="p-6 bg-gradient-to-r min-h-screen	bg-zinc-800 grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
       <Toaster position="top-center" />
       {[...polls]
         .sort((a, b) => {
@@ -47,7 +47,7 @@ const Home = () => {
           <PollCard
             key={poll._id}
             name={poll.pollName}
-            image={poll.pollImageUrl }
+            image={poll.pollImageUrl}
             expiryDate={poll.expiryDate}
             pollId={poll._id}
             totalVotes={poll.totalVotes}

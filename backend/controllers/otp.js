@@ -10,9 +10,11 @@ const sendOtpHandler = async (req, res) => {
 
   const otp = Math.floor(1000 + Math.random() * 9000);
 
+
   if (!email) {
+    console.log("here")
     try {
-      console.log("here")
+      
       const decoded = jwt.verify(token, process.env.SECRET_KEY);
       email = decoded.email;
     } catch (error) {

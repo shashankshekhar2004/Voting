@@ -52,7 +52,7 @@ const LivePolls = () => {
             <PollCard
               key={poll._id}
               name={poll.pollName}
-              image={img}
+              image={poll.pollImageUrl}
               expiryDate={poll.expiryDate}
               pollId={poll._id}
               totalVotes={poll.totalVotes}

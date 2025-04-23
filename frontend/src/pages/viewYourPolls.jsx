@@ -81,7 +81,7 @@ const ViewYourPolls = () => {
             <PollCard
               name={poll.pollName}
               pollId={poll._id}
-              image={img}
+              image={poll.pollImageUrl}
               description={poll.description}
               expiryDate={poll.expiryDate}
               totalVotes={poll.totalVotes}

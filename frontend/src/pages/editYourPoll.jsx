@@ -83,7 +83,7 @@ const EditYourPoll = () => {
           />
         </div>
 
-        <div>
+        {/* <div>
           <label className="block font-medium">Poll Image URL:</label>
           <input
             type="text"
@@ -91,7 +91,7 @@ const EditYourPoll = () => {
             onChange={(e) => setPollImageUrl(e.target.value)}
             className="w-full p-2 border rounded"
           />
-        </div>
+        </div> */}
 
         <div>
           <label className="block font-medium">Expiry Date & Time:</label>
@@ -120,7 +120,7 @@ const EditYourPoll = () => {
                 className="w-full p-2 mb-2 border rounded"
               />
 
-              <label className="block text-sm mb-1">Image URL:</label>
+              {/* <label className="block text-sm mb-1">Image URL:</label>
               <input
                 type="text"
                 value={candidate.candiadateImageUrl}
@@ -132,7 +132,7 @@ const EditYourPoll = () => {
                   )
                 }
                 className="w-full p-2 border rounded"
-              />
+              /> */}
             </div>
           ))}
         </div>

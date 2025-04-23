@@ -52,6 +52,7 @@ const CandidateCard = ({ candidate, pollId, expiryDate }) => {
       toast.dismiss();
       if (allowedToVote) {
         setShowOtpInput(true);
+        console.log("checked");
         await axios.post("http://localhost:8000/api/v1/sendotp", { token });
         toast.success("Otp sent successfully!");
       } else {
@@ -100,12 +101,12 @@ const CandidateCard = ({ candidate, pollId, expiryDate }) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl h-[50vh] shadow-md hover:shadow-xl transition-shadow duration-300 w-80 p-5 flex flex-col items-center text-center relative">
+    <div className="bg-orange-300 rounded-2xl h-[50vh] shadow-md hover:shadow-xl transition-shadow duration-300 w-80 p-5 flex flex-col items-center text-center relative">
       <Toaster position="top-center" />
       <img
         src={candidateImageUrl}
         alt={candidateName}
-        className="w-32 h-32 object-cover rounded-full border-4 border-gray-200 mb-4"
+        className="w-32 h-32 object-cover rounded-full border-4 border-purple-800 mb-4"
       />
       <h2 className="text-2xl font-semibold text-gray-800 mb-1">
         {candidateName}

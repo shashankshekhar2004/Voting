@@ -44,7 +44,7 @@ const ExpirePolls = () => {
             key={poll._id}
             pollId={poll._id}
             name={poll.pollName}
-            image={img}
+            image={poll.pollImageUrl}
             description={poll.description}
             expiryDate={poll.expiryDate}
             totalVotes={poll.totalVotes}
