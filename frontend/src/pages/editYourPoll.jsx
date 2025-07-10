@@ -16,7 +16,7 @@ const EditYourPoll = () => {
   useEffect(() => {
     if (passedPoll) {
       const expiry = new Date(passedPoll.expiryDate);
-      const localDateTime = expiry.toISOString().slice(0, 16); // Format: yyyy-MM-ddTHH:mm
+      const localDateTime = expiry.toISOString().slice(0, 16);
 
       setPollName(passedPoll.pollName);
       setPollImageUrl(passedPoll.pollImageUrl || "");

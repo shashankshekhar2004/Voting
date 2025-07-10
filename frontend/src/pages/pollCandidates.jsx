@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import CandidateCard from "../components/CandidateCard";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
@@ -11,28 +11,6 @@ const CandidatePage = () => {
   const userId = localStorage.getItem("id");
   const [expiryDate, setExpiryDate] = useState();
 
-  const allowed = async () => {
-    try {
-      if (!userId || !pollId) {
-        toast.error("Missing user or poll ID");
-        return;
-      }
-
-      const response = await axios.post(
-        `http://localhost:8000/api/v2/allowedtovote/${userId}`,
-        { pollId }
-      );
-
-      const { allowedToVote, message } = response.data;
-      toast.dismiss();
-
-      allowedToVote ? toast.success(message) : toast.error(message);
-    } catch (error) {
-      console.error("Error checking voting permission:", error);
-      toast.error("Something went wrong");
-    }
-  };
-
   useEffect(() => {
     const fetchCandidates = async () => {
       try {
@@ -40,45 +18,55 @@ const CandidatePage = () => {
         const response = await axios.post(
           "http://localhost:8000/api/v2/allpolls",
           {},
-          {
-            headers: {
-              authorization: `${token}`,
-            },
-          }
+          { headers: { authorization: `${token}` } }
         );
+
         if (response.data.loginStatus === 0) {
           toast.error("Login first");
           navigate("/login");
+          return;
         }
-        const polls = response.data.polls;
-        const targetPoll = polls.find((poll) => poll._id === pollId);
-        setExpiryDate(targetPoll.expiryDate);
-        //console.log(expiryDate);
+
+        const targetPoll = response.data.polls.find(
+          (poll) => poll._id === pollId
+        );
         if (targetPoll) {
           setCandidates(targetPoll.candidatesArray);
+          setExpiryDate(targetPoll.expiryDate);
         } else {
           console.warn("Poll not found for pollId:", pollId);
         }
       } catch (error) {
         console.error("Error fetching candidates:", error);
+        toast.error("Something went wrong");
       }
     };
 
     fetchCandidates();
-    // allowed();
-  }, []);
+  }, [pollId, navigate]);
 
   return (
-    <div className="flex flex-wrap gap-6 justify-center p-6 bg-zinc-800 min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-teal-700 via-cyan-800 to-emerald-700 p-6">
       <Toaster position="top-center" />
-      {candidates.map((candidate) => (
-        <CandidateCard
-          key={candidate.candidateId}
-          candidate={candidate}
-          pollId={pollId}
-          expiryDate={expiryDate}
-        />
-      ))}
+
+      <h1 className="text-3xl md:text-4xl font-bold text-center text-white mb-8">
+        Vote for Your Candidate
+      </h1>
+
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 justify-items-center">
+        {candidates.map((candidate) => (
+          <div
+            key={candidate.candidateId}
+            className="transition-transform duration-300 hover:-translate-y-1"
+          >
+            <CandidateCard
+              candidate={candidate}
+              pollId={pollId}
+              expiryDate={expiryDate}
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

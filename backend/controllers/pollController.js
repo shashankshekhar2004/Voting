@@ -38,7 +38,7 @@ const createPoll = async (req, res) => {
         }
 
         const poll = new pollModel(pollData);
-        console.log(poll)
+       // console.log(poll)
         await poll.save();
 
         return res.status(201).json({ message: 'Poll created successfully', poll });
@@ -135,7 +135,7 @@ const deletePoll = async (req, res) => {
     try {
         const { userId } = req.params;
         const { pollId } = req.body;
-        console.log(userId,pollId)
+       // console.log(userId,pollId)
 
         const poll = await pollModel.findById(pollId);
         if (!poll) {
@@ -268,9 +268,8 @@ const castVote = async (req, res) => {
     try {
         const { id } = req.params;
         const { pollId, candidateId, otp } = req.body;
-        console.log(otp, pollId, candidateId, id);
+        //console.log(otp, pollId, candidateId, id);
 
-        // 1. Find user
         const user = await userModel.findById(id);
         if (!user) {
             return res.status(404).json({ status: 404, message: "User not found" });
@@ -284,7 +283,6 @@ const castVote = async (req, res) => {
             return res.status(401).json({ status: 401, message: "Invalid OTP" });
         }
 
-        // Optionally delete OTP to prevent reuse
         await otpModel.deleteOne({ email });
 
         // 3. Fetch poll
@@ -309,15 +307,12 @@ const castVote = async (req, res) => {
         if (!candidate) {
             return res.status(404).json({ status: 404, message: "Candidate not found" });
         }
-
-        // 6. Increment vote
         candidate.votes += 1;
         poll.totalVotes += 1;
 
         // 7. Add to voters list
         poll.voters.push({ voterId: id, votedTo: candidateId });
 
-        // 8. Save poll
         await poll.save();
 
         return res.status(200).json({

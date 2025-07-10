@@ -7,7 +7,7 @@ app.use(cors());
 const userRouter=require('./routes/register.route')
 const pollRouter =require('./routes/poll.routes')
 
-app.use(express.json());
+app.use(express.json()); 
 connect();
 const port = process.env.PORT ||6000;
 

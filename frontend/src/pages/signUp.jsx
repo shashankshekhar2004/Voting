@@ -56,7 +56,7 @@ const SignupWithOTP = () => {
           otp: form.otp,
         }
       );
-      console.log(response);
+      //console.log(response);
       if (response.data.success === true) {
         toast.success(response.data.message);
         localStorage.setItem("token", response.data.token);

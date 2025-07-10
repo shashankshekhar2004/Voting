@@ -11,6 +11,7 @@ import CreatePoll from "./pages/createPoll";
 import CandidateCard from "./components/candidateCard";
 import CandidatePage from "./pages/pollCandidates";
 import EditYourPoll from "./pages/editYourPoll";
+import Contact from "./pages/contact";
 
 function AppContent() {
   const location = useLocation();
@@ -30,8 +31,9 @@ function AppContent() {
         <Route path="/viewyourpolls" element={<ViewYourPolls />} />
         <Route path="/pollcandiadtes/:pollId" element={<CandidatePage />} />
         <Route path="/edityourpoll" element={<EditYourPoll />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="*" element={<LivePolls />} />
-        </Routes>
+      </Routes>
     </>
   );
 }

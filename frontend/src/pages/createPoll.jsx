@@ -77,11 +77,9 @@ const CreatePoll = () => {
       const userId = localStorage.getItem("id");
       const token = localStorage.getItem("token");
 
-      // Upload poll image
       if (pollImage) {
         const PollImgData = new FormData();
         PollImgData.append("image", pollImage);
-
         const pollImgResponse = await axios.post(
           "http://localhost:8000/api/v2/imageUpload",
           PollImgData,
@@ -92,16 +90,13 @@ const CreatePoll = () => {
             },
           }
         );
-        console.log(pollImgResponse.data.imageUrl)
         pollData.pollImageUrl = pollImgResponse.data.imageUrl;
       }
 
-      // Upload candidate images
       if (candidateImages.length > 0) {
         for (let i = 0; i < candidateImages.length; i++) {
-          var candidateFormData = new FormData();
+          const candidateFormData = new FormData();
           candidateFormData.append("image", candidateImages[i]);
-
           const candidateImgResponse = await axios.post(
             "http://localhost:8000/api/v2/imageUpload",
             candidateFormData,
@@ -112,10 +107,8 @@ const CreatePoll = () => {
               },
             }
           );
-          // console.log(candidateImgResponse.data.imageUrl)
-          // console.log(candidateImgResponse.data)
-          pollData.candidatesArray[i].candidateImageUrl = candidateImgResponse.data.imageUrl;
-          // console.log(pollData.candidatesArray[i].candidateImageUrl)
+          pollData.candidatesArray[i].candidateImageUrl =
+            candidateImgResponse.data.imageUrl;
         }
       }
 
@@ -133,14 +126,11 @@ const CreatePoll = () => {
             : undefined,
         candidatesArray: pollData.candidatesArray,
       };
-      console.log(payload);
 
       const res = await axios.post(
         `http://localhost:8000/api/v2/createpoll/${userId}`,
         payload,
-        {
-          headers: { authorization: token },
-        }
+        { headers: { authorization: token } }
       );
 
       if (res.data.loginStatus === 0) {
@@ -157,10 +147,13 @@ const CreatePoll = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded mt-6">
+    <div className="max-w-4xl mx-auto p-8 mt-8 bg-gradient-to-br from-purple-100 via-purple-200 to-indigo-200 shadow-2xl rounded-3xl">
       <Toaster position="top-center" />
-      <h2 className="text-2xl font-bold mb-4">Create a Poll</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <h2 className="text-3xl font-bold text-center text-indigo-700 mb-6">
+        🗳️ Create a New Poll
+      </h2>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
         <input
           type="text"
           name="pollName"
@@ -168,14 +161,14 @@ const CreatePoll = () => {
           onChange={handleInputChange}
           placeholder="Poll Name"
           required
-          className="w-full border p-2 rounded"
+          className="w-full border border-indigo-300 p-3 rounded-xl focus:ring-2 focus:ring-indigo-300"
         />
 
         <input
           type="file"
           accept="image/*"
           onChange={(e) => setPollImage(e.target.files[0])}
-          className="w-full border p-2 rounded"
+          className="w-full border border-indigo-300 p-3 rounded-xl"
         />
 
         <textarea
@@ -183,19 +176,23 @@ const CreatePoll = () => {
           value={pollData.description}
           onChange={handleInputChange}
           placeholder="Poll Description"
-          className="w-full border p-2 rounded"
+          className="w-full border border-indigo-300 p-3 rounded-xl"
         />
 
+        <label className="block text-sm font-medium text-indigo-700">
+          Expiry Date & Time
+        </label>
         <input
           type="datetime-local"
           name="expiryDate"
           value={pollData.expiryDate}
           onChange={handleInputChange}
           required
-          className="w-full border p-2 rounded"
+          placeholder="Select expiry date and time"
+          className="w-full border border-indigo-300 p-3 rounded-xl"
         />
 
-        <label className="flex items-center gap-2 font-medium">
+        <label className="flex items-center gap-2 text-indigo-700 font-medium">
           <input
             type="checkbox"
             name="openToAll"
@@ -207,41 +204,41 @@ const CreatePoll = () => {
         </label>
 
         {!pollData.openToAll && (
-          <div className="border rounded p-4 bg-gray-100 space-y-4">
+          <div className="bg-purple-50 p-4 rounded-xl space-y-4 border border-purple-200">
             <input
               type="text"
               name="allowedDomains"
               value={pollData.allowedDomains}
               onChange={handleInputChange}
               placeholder="Allowed Domain (e.g. nitjsr.ac.in)"
-              className="w-full border p-2 rounded"
+              className="w-full border border-purple-300 p-3 rounded-xl"
               required
             />
 
             <div className="flex gap-6">
-              <label className="flex items-center gap-2">
+              <label className="flex items-center gap-2 text-purple-700">
                 <input
                   type="radio"
                   name="domainAccessType"
                   value="all"
-                  checked={pollData.domainAccessType === "*"}
+                  checked={pollData.domainAccessType === "all"}
                   onChange={handleInputChange}
                 />
                 Allow all emails of this domain
               </label>
-              <label className="flex items-center gap-2">
+              <label className="flex items-center gap-2 text-purple-700">
                 <input
                   type="radio"
                   name="domainAccessType"
                   value="range"
-                  checked={pollData.domainAccessType === "*"}
+                  checked={pollData.domainAccessType === "range"}
                   onChange={handleInputChange}
                 />
                 Allow only roll number range
               </label>
             </div>
 
-            {pollData.domainAccessType === "*" && (
+            {pollData.domainAccessType === "range" && (
               <div className="flex gap-4">
                 <input
                   type="text"
@@ -249,7 +246,7 @@ const CreatePoll = () => {
                   value={pollData.allowedRollRange.from}
                   onChange={handleInputChange}
                   placeholder="Roll Number From"
-                  className="w-full border p-2 rounded"
+                  className="w-full border border-purple-300 p-3 rounded-xl"
                 />
                 <input
                   type="text"
@@ -257,16 +254,19 @@ const CreatePoll = () => {
                   value={pollData.allowedRollRange.to}
                   onChange={handleInputChange}
                   placeholder="Roll Number To"
-                  className="w-full border p-2 rounded"
+                  className="w-full border border-purple-300 p-3 rounded-xl"
                 />
               </div>
             )}
           </div>
         )}
 
-        <h3 className="text-lg font-semibold">Candidates</h3>
+        <h3 className="text-lg font-semibold text-indigo-700">Candidates</h3>
         {pollData.candidatesArray.map((candidate, index) => (
-          <div key={index} className="border p-4 rounded space-y-2 bg-gray-50">
+          <div
+            key={index}
+            className="bg-indigo-50 border border-indigo-200 p-4 rounded-xl space-y-2"
+          >
             <input
               type="text"
               placeholder="Candidate Name"
@@ -274,7 +274,7 @@ const CreatePoll = () => {
               onChange={(e) =>
                 handleCandidateChange(index, "candidateName", e.target.value)
               }
-              className="w-full border p-2 rounded"
+              className="w-full border border-indigo-300 p-3 rounded-xl"
               required
             />
             <input
@@ -284,7 +284,7 @@ const CreatePoll = () => {
               onChange={(e) =>
                 handleCandidateChange(index, "description", e.target.value)
               }
-              className="w-full border p-2 rounded"
+              className="w-full border border-indigo-300 p-3 rounded-xl"
               required
             />
             <input
@@ -295,7 +295,7 @@ const CreatePoll = () => {
                 updatedImages[index] = e.target.files[0];
                 setCandidateImages(updatedImages);
               }}
-              className="w-full border p-2 rounded"
+              className="w-full border border-indigo-300 p-3 rounded-xl"
             />
           </div>
         ))}
@@ -303,16 +303,16 @@ const CreatePoll = () => {
         <button
           type="button"
           onClick={addCandidate}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="bg-purple-600 text-white px-4 py-2 rounded-xl hover:bg-purple-700"
         >
-          Add Candidate
+          ➕ Add Candidate
         </button>
 
         <button
           type="submit"
-          className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 mt-4"
+          className="bg-green-600 text-white px-6 py-2 rounded-xl hover:bg-green-700 mt-4"
         >
-          Create Poll
+          ✅ Create Poll
         </button>
       </form>
     </div>

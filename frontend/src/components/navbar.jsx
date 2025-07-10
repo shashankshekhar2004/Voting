@@ -24,7 +24,6 @@ const SlidingNavbar = () => {
 
   return (
     <div className="relative">
-      {/* Hamburger Button */}
       <button
         onClick={() => setOpen(true)}
         className="text-white p-3 fixed top-4 left-4 z-50 bg-gray-800 rounded-lg shadow-lg"
@@ -58,7 +57,6 @@ const SlidingNavbar = () => {
               </button>
             </div>
 
-            {/* Links */}
             <nav
               onClick={() => setOpen(false)}
               className="flex flex-col p-4 space-y-4 text-gray-700 dark:text-white"
@@ -94,7 +92,7 @@ const SlidingNavbar = () => {
                 <Plus size={18} /> Create Poll
               </Link>
               <Link
-                to="#"
+                to="/contact"
                 className="flex items-center gap-2 hover:text-blue-500"
               >
                 <Phone size={18} /> Contact
@@ -102,7 +100,6 @@ const SlidingNavbar = () => {
             </nav>
           </div>
 
-          {/* Logout Button */}
           <div className="p-4 border-t border-gray-300 dark:border-gray-700">
             <button
               onClick={handleLogout}

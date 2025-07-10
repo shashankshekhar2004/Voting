@@ -4,7 +4,7 @@ const OtpModel = require('../models/otp')
 const jwt = require('jsonwebtoken')
 const register = async (req, res) => {
     try {
-        const { name, password, email, fingerprint, otp } = req.body;
+        const { name, password, email, otp } = req.body;
         if (!name || !password || !email) {
             return res.send({
                 success:false,
