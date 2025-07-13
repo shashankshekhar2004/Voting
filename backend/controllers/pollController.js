@@ -156,51 +156,6 @@ const deletePoll = async (req, res) => {
 };
 
 
-
-
-
-// const editYourPoll = async (req, res) => {
-//     try {
-//         const { pollId, pollData } = req.body;
-
-//         // Find the poll
-//         const poll = await pollModel.findById(pollId);
-//         if (!poll) {
-//             return res.status(404).json({ status: false, error: 'Poll not found.' });
-//         }
-
-//         // Check if the user is the creator
-//         // // if (poll.createdBy.toString() !== userId) {
-//         //     return res.status(403).json({ status: false, error: 'You are not authorized to edit this poll.' });
-//         // }
-
-//         // Allowed fields to update
-//         const updatableFields = [
-//             'pollName',
-//             'candidatesArray',
-//             'pollImageUrl',
-//             'expiryDate',
-//             'openToAll',
-//             'allowedRollRange',
-//             'allowedDomains'
-//         ];
-
-//         // Apply updates safely
-//         updatableFields.forEach(field => {
-//             if (pollData[field] !== undefined) {
-//                 poll[field] = pollData[field];
-//             }
-//         });
-
-//         await poll.save();
-
-//         return res.status(200).json({ status: true, message: 'Poll updated successfully.', updatedPoll: poll });
-//     } catch (error) {
-//         console.error(error);
-//         return res.status(500).json({ status: false, error: 'Something went wrong while updating the poll.' });
-//     }
-// };
-
 const editYourPoll = async (req, res) => {
     try {
       const { pollId } = req.params;
@@ -231,8 +186,8 @@ const editYourPoll = async (req, res) => {
             if (updatedCandidate.description) {
               existingCandidate.description = updatedCandidate.description;
             }
-            if (updatedCandidate.candiadateImageUrl) {
-              existingCandidate.candiadateImageUrl = updatedCandidate.candiadateImageUrl;
+            if (updatedCandidate.candidateImageUrl) {
+              existingCandidate.candidateImageUrl = updatedCandidate.candidateImageUrl;
             }
           }
         });
@@ -277,7 +232,7 @@ const castVote = async (req, res) => {
 
         const email = user.email;
 
-        // 2. Validate OTP
+        
         const isValidOtp = await otpModel.findOne({ email });
         if (!isValidOtp || isValidOtp.otp !== otp) {
             return res.status(401).json({ status: 401, message: "Invalid OTP" });
@@ -285,7 +240,7 @@ const castVote = async (req, res) => {
 
         await otpModel.deleteOne({ email });
 
-        // 3. Fetch poll
+      
         const poll = await pollModel.findById(pollId);
         if (!poll) {
             return res.status(404).json({ status: 404, message: "Poll not found" });
@@ -302,7 +257,6 @@ const castVote = async (req, res) => {
             });
         }
 
-        // 5. Find candidate
         const candidate = poll.candidatesArray.find(c => c.candidateId === candidateId);
         if (!candidate) {
             return res.status(404).json({ status: 404, message: "Candidate not found" });
@@ -310,7 +264,6 @@ const castVote = async (req, res) => {
         candidate.votes += 1;
         poll.totalVotes += 1;
 
-        // 7. Add to voters list
         poll.voters.push({ voterId: id, votedTo: candidateId });
 
         await poll.save();

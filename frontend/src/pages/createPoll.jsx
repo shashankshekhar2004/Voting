@@ -171,13 +171,13 @@ const CreatePoll = () => {
           className="w-full border border-indigo-300 p-3 rounded-xl"
         />
 
-        <textarea
+        {/* <textarea
           name="description"
           value={pollData.description}
           onChange={handleInputChange}
           placeholder="Poll Description"
           className="w-full border border-indigo-300 p-3 rounded-xl"
-        />
+        /> */}
 
         <label className="block text-sm font-medium text-indigo-700">
           Expiry Date & Time
